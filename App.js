@@ -6,6 +6,8 @@ import { COLORS, icons, images, SIZES } from "./constants";
 import React, { useState, useEffect } from "react";
 import firebase from "./config/firebase/config";
 
+import AppNavigator from "./navigation/AppNavigator";
+
 import Login from "./components/login/Login";
 import Register from "./components/register/Register";
 import Dashboard from "./components/dashboard/Dashboard";
@@ -46,6 +48,10 @@ function App() {
 		if (initializing) setInitializing(false);
 	}
 
+	const logout = () => {
+		firebase.auth().signOut();
+	};
+
 	useEffect(() => {
 		const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
 		return subscriber; // unsubscribe on unmount
@@ -53,45 +59,7 @@ function App() {
 
 	if (initializing || !fontsLoaded) return null;
 
-	if (!user) {
-		return (
-			<Stack.Navigator>
-				<Stack.Screen
-					name="Login"
-					component={Login}
-					options={{
-						// headerTitle: () => <Header name="Login" />,
-						headerShown: false,
-					}}
-				/>
-				<Stack.Screen
-					name="Register"
-					component={Register}
-					options={{
-						headerShown: false,
-					}}
-				/>
-			</Stack.Navigator>
-		);
-	}
-
-	return (
-		<Stack.Navigator>
-			<Stack.Screen
-				name="Dashboard"
-				component={Dashboard}
-				options={{
-					headerShown: false,
-				}}
-			/>
-		</Stack.Navigator>
-	);
+	return <AppNavigator user={user} onLogout={logout} />;
 }
 
-export default () => {
-	return (
-		<NavigationContainer>
-			<App />
-		</NavigationContainer>
-	);
-};
+export default App;

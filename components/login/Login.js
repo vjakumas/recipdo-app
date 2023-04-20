@@ -14,7 +14,7 @@ const Login = () => {
 	loginUser = async (email, password) => {
 		try {
 			await firebase.auth().signInWithEmailAndPassword(email, password);
-			navigation.navigate("Dashboard");
+			navigation.reset({ index: 0, routes: [{ name: "Dashboard" }] });
 		} catch (error) {
 			alert(error.message);
 		}

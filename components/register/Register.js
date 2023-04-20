@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, ImageBackground, TouchableWithoutFeedback, Keyboard } from "react-native";
 import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, CommonActions } from "@react-navigation/native";
 import { COLORS, icons, images, SIZES } from "../../constants";
 import styles from "./register.style";
 
@@ -45,8 +45,7 @@ const Register = () => {
 						alert(error.message);
 					})
 					.then(() => {
-						// Navigate to the Login screen after successful registration
-						navigation.navigate(Login);
+						navigation.reset({ index: 0, routes: [{ name: "Login" }] });
 					});
 			})
 			.catch((error) => {
