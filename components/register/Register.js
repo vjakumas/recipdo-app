@@ -1,14 +1,17 @@
 import { View, Text, TouchableOpacity, TextInput, StyleSheet } from "react-native";
 import React, { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import styles from "./register.style";
 
 import firebase from "../../config/firebase/config";
 import { Touchable } from "react-native";
 
 const Register = () => {
+	const navigation = useNavigation();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [firstName, setFirstName] = useState("");
-	const [lastName, setLastName] = useState("");
+	const [confirmPassword, setConfirmPassword] = useState("");
+	const [name, setName] = useState("");
 
 	registerUser = async (email, password, firstName, lastName) => {
 		await firebase
@@ -44,6 +47,62 @@ const Register = () => {
 	};
 	return (
 		<View style={styles.container}>
+			<Text style={styles.headerTitle}>Join us & cook with!{"\n"}confidence!</Text>
+			<View style={styles.inputContainer}>
+				<View style={styles.inputWrapper}>
+					<TextInput
+						style={styles.inputInput}
+						onChangeText={(name) => setName(name)}
+						placeholder="Name"
+						placeholderTextColor="gray"
+						autoCapitalize="none"
+						autoCorrect={false}
+						secureTextEntry={true}
+					/>
+				</View>
+			</View>
+			<View style={styles.inputContainer}>
+				<View style={styles.inputWrapper}>
+					<TextInput
+						style={styles.inputInput}
+						onChangeText={(email) => setEmail(email)}
+						placeholder="Email"
+						format="email"
+						placeholderTextColor="gray"
+						autoCapitalize="none"
+						autoCorrect={false}
+						secureTextEntry={true}
+					/>
+				</View>
+			</View>
+			<View style={styles.inputContainer}>
+				<View style={styles.inputWrapper}>
+					<TextInput
+						style={styles.inputInput}
+						onChangeText={(password) => setPassword(password)}
+						placeholder="Password"
+						placeholderTextColor="gray"
+						autoCapitalize="none"
+						autoCorrect={false}
+						secureTextEntry={true}
+					/>
+				</View>
+			</View>
+			<View style={styles.inputContainer}>
+				<View style={styles.inputWrapper}>
+					<TextInput
+						style={styles.inputInput}
+						onChangeText={(confirmPassoword) => setConfirmPassword(confirmPassoword)}
+						placeholder="Confirm password"
+						placeholderTextColor="gray"
+						autoCapitalize="none"
+						autoCorrect={false}
+						secureTextEntry={true}
+					/>
+				</View>
+			</View>
+
+			{/* <View style={styles.container}>
 			<Text style={{ fontWeight: "bold", fontSize: 26 }}>Register here</Text>
 			<View style={{ marginTop: 40 }}>
 				<TextInput
@@ -69,39 +128,15 @@ const Register = () => {
 					autoCapitalize="none"
 					secureTextEntry={true}
 				/>
-			</View>
-			<TouchableOpacity onPress={() => registerUser(email, password, firstName, lastName)} style={styles.button}>
-				<Text style={{ fontWeight: "bold", fontSize: 16 }}>Register</Text>
+			</View> */}
+			<TouchableOpacity onPress={() => registerUser(email, password, firstName, lastName)} style={styles.submitButton}>
+				<Text style={styles.submitButtonText}>Register</Text>
+			</TouchableOpacity>
+			<TouchableOpacity onPress={() => navigation.navigate("Login")} style={styles.registerButton}>
+				<Text style={{ fontWeight: "bold", fontSize: 16 }}>Already have an account? Sign in</Text>
 			</TouchableOpacity>
 		</View>
 	);
 };
 
 export default Register;
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		alignItems: "center",
-		marginTop: 100,
-	},
-	textInput: {
-		paddingTop: 20,
-		paddingBottom: 10,
-		width: 400,
-		fontSize: 20,
-		borderBottomWidth: 1,
-		borderBottomColor: "#000",
-		marginBottom: 100,
-		textAlign: "center",
-	},
-	button: {
-		marginTop: 50,
-		heaight: 70,
-		width: 250,
-		backgroundColor: "#026efd",
-		alignItems: "center",
-		justifyContent: "center",
-		borderRadius: 50,
-	},
-});

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import firebase from "../../config/firebase/config";
 import { COLORS, icons, images, SIZES } from "../../constants";
+import styles from "./login.style";
 import { Touchable } from "react-native";
 
 const Login = () => {
@@ -21,13 +22,39 @@ const Login = () => {
 
 	return (
 		<View style={styles.container}>
-			<Text style={{ fontWeight: "bold", fontSize: 26 }}>Log in</Text>
-			<View>
-				<TextInput
+			<Text style={styles.headerTitle}>Welcome back!{"\n"}You have been missed!</Text>
+			<View style={styles.inputContainer}>
+				<View style={styles.inputWrapper}>
+					<TextInput
+						style={styles.inputInput}
+						onChangeText={(email) => setEmail(email)}
+						placeholder="Email"
+						placeholderTextColor="gray"
+						autoCapitalize="none"
+						autoCorrect={false}
+						secureTextEntry={true}
+					/>
+				</View>
+			</View>
+			<View style={styles.inputContainer}>
+				<View style={styles.inputWrapper}>
+					<TextInput
+						style={styles.inputInput}
+						onChangeText={(password) => setPassword(password)}
+						placeholder="Password"
+						placeholderTextColor="gray"
+						autoCapitalize="none"
+						autoCorrect={false}
+						secureTextEntry={true}
+					/>
+				</View>
+			</View>
+			{/* <TextInput
 					style={styles.textInput}
 					placeholder="Email"
 					onChangeText={(email) => setEmail(email)}
 					autoCapitalize="none"
+					format="email"
 					autoCorrect={false}
 				/>
 				<TextInput
@@ -37,12 +64,11 @@ const Login = () => {
 					autoCapitalize="none"
 					autoCorrect={false}
 					secureTextEntry={true}
-				/>
-			</View>
-			<TouchableOpacity onPress={() => loginUser(email, password)} style={styles.button}>
-				<Text style={{ fontWeight: "bold", fontSize: 22 }}>Login</Text>
+				/> */}
+			<TouchableOpacity onPress={() => loginUser(email, password)} style={styles.submitButton}>
+				<Text style={styles.submitButtonText}>Sign in</Text>
 			</TouchableOpacity>
-			<TouchableOpacity onPress={() => navigation.navigate("Register")} style={{ marginTop: 20 }}>
+			<TouchableOpacity onPress={() => navigation.navigate("Register")} style={styles.registerButton}>
 				<Text style={{ fontWeight: "bold", fontSize: 16 }}>Dont have an account? Register now</Text>
 			</TouchableOpacity>
 		</View>
@@ -50,30 +76,3 @@ const Login = () => {
 };
 
 export default Login;
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		alignItems: "center",
-		marginTop: 100,
-	},
-	textInput: {
-		paddingTop: 20,
-		paddingBottom: 10,
-		width: 400,
-		fontSize: 20,
-		borderBottomWidth: 1,
-		borderBottomColor: "#000",
-		marginBottom: 100,
-		textAlign: "center",
-	},
-	button: {
-		marginTop: 50,
-		heaight: 70,
-		width: 250,
-		backgroundColor: "#026efd",
-		alignItems: "center",
-		justifyContent: "center",
-		borderRadius: 50,
-	},
-});
