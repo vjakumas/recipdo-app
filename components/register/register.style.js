@@ -1,8 +1,19 @@
 import { StyleSheet } from "react-native";
 
-import { COLORS, FONT, SIZES } from "../../constants";
+import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
 
 const styles = StyleSheet.create({
+	topImage: {
+		flex: 1,
+		width: "100%",
+		height: "20%",
+	},
+	mainContainer: {
+		borderRadius: 30,
+		height: "100%",
+		marginTop: 150,
+		backgroundColor: COLORS.white,
+	},
 	container: {
 		marginHorizontal: SIZES.xLarge,
 		marginTop: 50,
@@ -14,7 +25,7 @@ const styles = StyleSheet.create({
 		marginTop: SIZES.small,
 	},
 	headerTitle: {
-		fontSize: SIZES.large,
+		fontSize: SIZES.xLarge,
 		fontFamily: FONT.bold,
 		color: COLORS.darkGray,
 		textAlign: "center",
@@ -30,7 +41,7 @@ const styles = StyleSheet.create({
 		gap: SIZES.small,
 	},
 	inputContainer: {
-		marginTop: SIZES.medium,
+		marginTop: SIZES.xLarge,
 		height: 60,
 		width: "100%",
 	},
@@ -41,9 +52,9 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		borderRadius: SIZES.medium,
+		borderColor: COLORS.lightGray,
 		height: "100%",
 		width: "100%",
-		borderColor: COLORS.lightGray,
 		borderWidth: 1,
 		borderRadius: 15,
 	},
@@ -61,6 +72,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		marginTop: 50,
+		...SHADOWS.xLarge,
 	},
 	submitButtonText: {
 		fontFamily: FONT.bold,

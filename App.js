@@ -2,6 +2,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { AppRegistry } from "react-native";
 import { useFonts } from "expo-font";
+import { COLORS, icons, images, SIZES } from "./constants";
 import React, { useState, useEffect } from "react";
 import firebase from "./config/firebase/config";
 
@@ -56,18 +57,18 @@ function App() {
 		return (
 			<Stack.Navigator>
 				<Stack.Screen
-					name="Register"
-					component={Register}
-					options={{
-						headerTitle: () => <Header name="Register" />,
-						headerStyle: { backgroundColor: "#000" },
-					}}
-				/>
-				<Stack.Screen
 					name="Login"
 					component={Login}
 					options={{
-						headerTitle: () => <Header name="Login" />,
+						// headerTitle: () => <Header name="Login" />,
+						headerShown: false,
+					}}
+				/>
+				<Stack.Screen
+					name="Register"
+					component={Register}
+					options={{
+						headerShown: false,
 					}}
 				/>
 			</Stack.Navigator>
@@ -80,7 +81,7 @@ function App() {
 				name="Dashboard"
 				component={Dashboard}
 				options={{
-					headerTitle: () => <Header name="Dashboard" />,
+					headerShown: false,
 				}}
 			/>
 		</Stack.Navigator>

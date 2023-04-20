@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, ImageBackground, TouchableWithoutFeedback, Keyboard } from "react-native";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import firebase from "../../config/firebase/config";
@@ -21,57 +21,53 @@ const Login = () => {
 	};
 
 	return (
-		<View style={styles.container}>
-			<Text style={styles.headerTitle}>Welcome back!{"\n"}You have been missed!</Text>
-			<View style={styles.inputContainer}>
-				<View style={styles.inputWrapper}>
-					<TextInput
-						style={styles.inputInput}
-						onChangeText={(email) => setEmail(email)}
-						placeholder="Email"
-						placeholderTextColor="gray"
-						autoCapitalize="none"
-						autoCorrect={false}
-						secureTextEntry={true}
-					/>
-				</View>
+		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+			<View style={{ flex: 1 }}>
+				<ImageBackground source={images.topBackground} style={styles.topImage}>
+					<View style={styles.mainContainer}>
+						<View style={styles.container}>
+							<Text style={styles.headerTitle}>Welcome back!{"\n"}You have been missed!</Text>
+							<View style={styles.inputContainer}>
+								<View style={styles.inputWrapper}>
+									<TextInput
+										style={styles.inputInput}
+										onChangeText={(email) => setEmail(email)}
+										placeholder="Email"
+										placeholderTextColor="gray"
+										autoCapitalize="none"
+										autoCorrect={false}
+										inputType="email"
+										secureTextEntry={false}
+									/>
+								</View>
+							</View>
+							<View style={styles.inputContainer}>
+								<View style={styles.inputWrapper}>
+									<TextInput
+										style={styles.inputInput}
+										onChangeText={(password) => setPassword(password)}
+										placeholder="Password"
+										placeholderTextColor="gray"
+										autoCapitalize="none"
+										autoCorrect={false}
+										inputType="password"
+										secureTextEntry={true}
+									/>
+								</View>
+							</View>
+							<TouchableOpacity onPress={() => loginUser(email, password)} style={styles.submitButton}>
+								<Text style={styles.submitButtonText}>Sign in</Text>
+							</TouchableOpacity>
+							<TouchableOpacity onPress={() => navigation.navigate("Register")} style={styles.registerButton}>
+								<Text style={{ fontWeight: "bold", fontSize: 16 }}>
+									Don't have an account? <Text style={{ color: COLORS.primary }}>Register now</Text>
+								</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</ImageBackground>
 			</View>
-			<View style={styles.inputContainer}>
-				<View style={styles.inputWrapper}>
-					<TextInput
-						style={styles.inputInput}
-						onChangeText={(password) => setPassword(password)}
-						placeholder="Password"
-						placeholderTextColor="gray"
-						autoCapitalize="none"
-						autoCorrect={false}
-						secureTextEntry={true}
-					/>
-				</View>
-			</View>
-			{/* <TextInput
-					style={styles.textInput}
-					placeholder="Email"
-					onChangeText={(email) => setEmail(email)}
-					autoCapitalize="none"
-					format="email"
-					autoCorrect={false}
-				/>
-				<TextInput
-					style={styles.textInput}
-					placeholder="Password"
-					onChangeText={(password) => setPassword(password)}
-					autoCapitalize="none"
-					autoCorrect={false}
-					secureTextEntry={true}
-				/> */}
-			<TouchableOpacity onPress={() => loginUser(email, password)} style={styles.submitButton}>
-				<Text style={styles.submitButtonText}>Sign in</Text>
-			</TouchableOpacity>
-			<TouchableOpacity onPress={() => navigation.navigate("Register")} style={styles.registerButton}>
-				<Text style={{ fontWeight: "bold", fontSize: 16 }}>Dont have an account? Register now</Text>
-			</TouchableOpacity>
-		</View>
+		</TouchableWithoutFeedback>
 	);
 };
 
