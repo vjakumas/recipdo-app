@@ -60,7 +60,7 @@ const Login = () => {
 							</TouchableOpacity>
 							<TouchableOpacity onPress={() => navigation.navigate("Register")} style={styles.registerButton}>
 								<Text style={{ fontWeight: "bold", fontSize: 16 }}>
-									Don't have an account? <Text style={{ color: COLORS.primary }}>Register now</Text>
+									Don't have an account? <Text style={{ color: COLORS.primary }}>Sign up</Text>
 								</Text>
 							</TouchableOpacity>
 						</View>
