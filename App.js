@@ -8,11 +8,6 @@ import firebase from "./config/firebase/config";
 
 import AppNavigator from "./navigation/AppNavigator";
 
-import Login from "./components/login/Login";
-import Register from "./components/register/Register";
-import Dashboard from "./components/dashboard/Dashboard";
-import Header from "./components/Header";
-
 const Stack = createStackNavigator();
 
 function App() {
