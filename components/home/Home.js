@@ -148,7 +148,7 @@ const Home = () => {
 				<View style={styles.topBar}>
 					<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} />
 					<View style={styles.rightIcons}>
-						<Ionicons name="notifications-outline" size={24} color={COLORS.darkGray} />
+						<Ionicons name="notifications-outline" size={24} color={COLORS.darkGray} style={styles.notificationIcon} />
 						<ProfileDropdown
 							ref={profileDropdownRef}
 							handleSettings={handleSettings}

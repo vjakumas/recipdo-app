@@ -36,9 +36,12 @@ const Register = () => {
 						firebase.firestore().collection("users").doc(firebase.auth().currentUser.uid).set({
 							name,
 							email,
+							consumedProducts: 0,
+							expiringProducts: 0,
 							savedRecipes: [],
 							finishedRecipes: [],
 							pantryItems: [],
+							recentSearchedRecipes: [],
 						});
 					})
 					.catch((error) => {

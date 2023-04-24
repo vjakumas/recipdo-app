@@ -37,6 +37,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 		marginTop: 20,
 	},
+	notificationIcon: {
+		marginRight: 15,
+	},
 	header: {
 		flexDirection: "row",
 		justifyContent: "space-between",
