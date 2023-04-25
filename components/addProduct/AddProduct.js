@@ -13,7 +13,7 @@ const AddProduct = ({ navigation }) => {
 				<Text style={styles.subText}>Expand your cooking horizons with a new ingredient!</Text>
 			</View>
 			<View style={styles.bottomContainer}>
-				<TouchableOpacity onPress={() => console.log("Add new product")} style={styles.primaryButton}>
+				<TouchableOpacity onPress={() => navigation.navigate("AddNewProduct")} style={styles.primaryButton}>
 					<View style={styles.buttonContent}>
 						<Icon name="add-circle" size={24} style={{ marginRight: 10, color: COLORS.white }} />
 						<Text style={styles.primaryButtonText}>Add new product</Text>

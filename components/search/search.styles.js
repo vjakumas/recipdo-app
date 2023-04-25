@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
 		marginHorizontal: SIZES.small,
 		...SHADOWS.recipeCard,
 	},
+
 	recipeImage: {
 		height: 180,
 	},
@@ -143,6 +144,23 @@ const styles = StyleSheet.create({
 	infoText: {
 		marginLeft: 5,
 		color: "white",
+	},
+	noResultsContainer: {
+		alignItems: "center",
+		justifyContent: "center",
+		marginTop: 225,
+	},
+	noResultsLabel: {
+		fontFamily: FONT.bold,
+		fontSize: SIZES.large,
+		color: COLORS.gray,
+	},
+	noResultsSublabel: {
+		fontFamily: FONT.regular,
+		fontSize: SIZES.medium,
+		color: COLORS.gray,
+		textAlign: "center",
+		marginTop: SIZES.small,
 	},
 });
 

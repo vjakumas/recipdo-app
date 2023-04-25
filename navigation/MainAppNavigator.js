@@ -8,7 +8,10 @@ import Search from "../components/search/Search";
 import AddProduct from "../components/addProduct/AddProduct";
 import PantryList from "../components/pantryList/PantryList";
 import SavedRecipes from "../components/savedRecipes/SavedRecipes";
+import AddNewProduct from "../components/addNewProduct/AddNewProduct";
+
 import MainStackNavigator from "./MainStackNavigator";
+import AddProductStackNavigator from "./AddProductStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -46,7 +49,7 @@ const MainAppNavigator = () => {
 			})}>
 			<Tab.Screen name="Main" component={MainStackNavigator} />
 			<Tab.Screen name="Search" component={Search} />
-			<Tab.Screen name="Add Product" component={AddProduct} />
+			<Tab.Screen name="Add Product" component={AddProductStackNavigator} />
 			<Tab.Screen name="Pantry List" component={PantryList} />
 			<Tab.Screen name="Saved" component={SavedRecipes} />
 		</Tab.Navigator>

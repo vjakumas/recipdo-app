@@ -142,19 +142,32 @@ const Search = () => {
 				{renderSearchTypeButton("Name")}
 				{renderSearchTypeButton("Ingredients")}
 			</View>
-			<Text style={styles.searchResultsHeading}>Search Results</Text>
+			{searchResultsData.length > 0 && (
+				<View>
+					<Text style={styles.searchResultsHeading}>Search Results</Text>
+				</View>
+			)}
 			{loading ? ( // Add this conditional rendering
-				<ActivityIndicator size="large" color={COLORS.primary} />
+				<ActivityIndicator size="large" style={{ marginTop: 225 }} color={COLORS.primary} />
 			) : (
-				<FlatList
-					data={searchResultsData}
-					renderItem={({ item }) => (
-						<View key={item.id}>
-							<RecipeCard recipe={item} />
+				<>
+					{searchResultsData.length === 0 && (
+						<View style={styles.noResultsContainer}>
+							<Text style={styles.noResultsLabel}>Let's Get Cooking!</Text>
+							<Text style={styles.noResultsSublabel}>Find delicious recipes for any occasion</Text>
 						</View>
 					)}
-					keyExtractor={(item) => item.id.toString()}
-				/>
+					<FlatList
+						contentContainerStyle={styles.flatListContainer} // Add this line
+						data={searchResultsData}
+						renderItem={({ item }) => (
+							<View key={item.id}>
+								<RecipeCard recipe={item} />
+							</View>
+						)}
+						keyExtractor={(item) => item.id.toString()}
+					/>
+				</>
 			)}
 		</SafeAreaView>
 	);
