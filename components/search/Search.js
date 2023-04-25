@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, Image, FlatList } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, Image, FlatList, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "./search.styles";
 import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
@@ -12,13 +12,13 @@ const RecipeCard = ({ recipe }) => {
 			<View style={{ overflow: "hidden" }}>
 				<Image source={{ uri: recipe.image }} style={styles.recipeImage} />
 				<LinearGradient colors={["transparent", "rgba(0, 0, 0, 0.8)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.overlay}>
-					<Text style={styles.recipeType}>Type: {recipe.type}</Text>
+					<Text style={styles.recipeType}>{recipe.dishTypes[0].substring(0, 1).toUpperCase() + recipe.dishTypes[0].substring(1)}</Text>
 					<Text style={styles.recipeName}>{recipe.title}</Text>
 				</LinearGradient>
 				<View style={styles.infoBar}>
 					<View style={styles.infoItem}>
 						<View style={styles.greenDot} />
-						<Text style={styles.infoText}>{recipe.ingredientsCount} Ingredients</Text>
+						<Text style={styles.infoText}>{recipe.extendedIngredients.length} Ingredients</Text>
 					</View>
 					<View style={styles.infoItem}>
 						<Ionicons name="time-outline" size={16} color="white" />
@@ -32,43 +32,79 @@ const RecipeCard = ({ recipe }) => {
 
 const Search = () => {
 	const [searchText, setSearchText] = useState("");
-	const [searchResults, setSearchResults] = useState([]);
-	const [searchType, setSearchType] = useState("name");
+	const [searchResultsId, setSearchResultsId] = useState([]);
+	const [searchResultsData, setSearchResultsData] = useState([]);
+	const [searchType, setSearchType] = useState("Name");
+	const [loading, setLoading] = useState(false);
 
 	const handleSearch = async () => {
 		if (!searchText) {
-			setSearchResults([]);
+			setSearchResultsId([]);
 			return;
 		}
 
+		setLoading(true);
+
 		let url = "";
-		if (searchType === "name") {
-			url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch";
+		let options = {};
+		if (searchType === "Name") {
+			url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/searchComplex";
+			options = {
+				method: "GET",
+				url: url,
+				params: {
+					query: searchText,
+					number: "10",
+				},
+				headers: {
+					"content-type": "application/octet-stream",
+					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+				},
+			};
 		} else {
 			url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients";
+			options = {
+				method: "GET",
+				url: url,
+				params: {
+					ingredients: searchText,
+					number: "10",
+				},
+				headers: {
+					"content-type": "application/octet-stream",
+					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+				},
+			};
 		}
 
-		const options = {
-			method: "GET",
-			url: url,
-			params: {
-				query: searchText,
-				ingredients: searchText,
-				number: "10",
-			},
-			headers: {
-				"content-type": "application/octet-stream",
-				"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
-				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-			},
-		};
-
 		try {
-			const response = await axios.request(options);
-			setSearchResults(response.data.results || response.data);
+			const searchResponse = await axios.request(options);
+
+			const recipeIds = (searchResponse.data.results || searchResponse.data).map((recipe) => recipe.id).join(",");
+
+			const recipeInfoOptions = {
+				method: "GET",
+				url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk",
+				params: { ids: recipeIds },
+				headers: {
+					"content-type": "application/octet-stream",
+					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+				},
+			};
+
+			const [, recipeInfoResponse] = await Promise.all([Promise.resolve(searchResponse), axios.request(recipeInfoOptions)]);
+
+			setSearchResultsId(searchResponse.data.results || searchResponse.data);
+			setSearchResultsData(recipeInfoResponse.data);
+			setLoading(false);
 		} catch (error) {
 			console.error(error);
-			setSearchResults([]);
+			setSearchResultsId([]);
+			setSearchResultsData([]);
+			setLoading(false);
 		}
 	};
 
@@ -76,7 +112,9 @@ const Search = () => {
 		const isSelected = searchType === type;
 
 		return (
-			<TouchableOpacity onPress={() => setSearchType(type)} style={[styles.searchTypeButton, isSelected && styles.searchTypeButtonSelected]}>
+			<TouchableOpacity
+				onPress={() => setSearchType(type)}
+				style={[styles.searchTypeButton, isSelected && styles.searchTypeButtonSelected, type === "Name" && styles.buttonMargin]}>
 				<Text style={[styles.searchTypeText, isSelected && styles.searchTypeTextSelected]}>{type}</Text>
 			</TouchableOpacity>
 		);
@@ -87,7 +125,10 @@ const Search = () => {
 			<View style={styles.logoContainer}>
 				<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} resizeMode="contain" />
 			</View>
-			<View style={styles.searchBarContainer}>
+			<View style={styles.searchContainer}>
+				<View style={styles.searchIconContainer}>
+					<Ionicons name="search" size={20} color={COLORS.gray} />
+				</View>
 				<TextInput
 					style={styles.searchInput}
 					value={searchText}
@@ -96,17 +137,25 @@ const Search = () => {
 					returnKeyType="search"
 					onSubmitEditing={handleSearch}
 				/>
-				<View style={styles.searchTypeContainer}>
-					{renderSearchTypeButton("Name")}
-					{renderSearchTypeButton("Ingredient")}
-				</View>
+			</View>
+			<View style={styles.buttonsContainer}>
+				{renderSearchTypeButton("Name")}
+				{renderSearchTypeButton("Ingredients")}
 			</View>
 			<Text style={styles.searchResultsHeading}>Search Results</Text>
-			<FlatList
-				data={searchResults}
-				renderItem={({ item }) => <RecipeCard key={item.idMeal} recipe={item} />}
-				keyExtractor={(item) => item.idMeal}
-			/>
+			{loading ? ( // Add this conditional rendering
+				<ActivityIndicator size="large" color={COLORS.primary} />
+			) : (
+				<FlatList
+					data={searchResultsData}
+					renderItem={({ item }) => (
+						<View key={item.id}>
+							<RecipeCard recipe={item} />
+						</View>
+					)}
+					keyExtractor={(item) => item.id.toString()}
+				/>
+			)}
 		</SafeAreaView>
 	);
 };
