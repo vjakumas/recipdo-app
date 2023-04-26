@@ -4,12 +4,49 @@ import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
+		backgroundColor: COLORS.white,
 	},
-	title: {
-		fontSize: 24,
+	logoContainer: {
+		alignItems: "center",
+		marginTop: 5,
+	},
+	logo: {
+		width: "50%",
+		height: 40,
+	},
+	sectionTitle: {
+		fontSize: 18,
 		fontWeight: "bold",
+		color: COLORS.black,
+		marginLeft: 16,
+		marginTop: 20,
+		marginBottom: 10,
+	},
+	searchContainer: {
+		flexDirection: "row",
+		alignItems: "center",
+		paddingHorizontal: SIZES.medium,
+		marginTop: SIZES.medium,
+		backgroundColor: COLORS.white,
+		borderRadius: 15,
+		borderColor: COLORS.lightGray,
+		borderWidth: 1,
+		height: 50,
+		marginBottom: SIZES.small,
+		marginLeft: 10,
+		marginRight: 10,
+	},
+	searchInput: {
+		flex: 1,
+		marginLeft: 40,
+		fontFamily: FONT.regular,
+		fontSize: SIZES.medium,
+		height: "100%",
+	},
+	searchIconContainer: {
+		position: "absolute",
+		left: SIZES.medium + 10,
+		zIndex: 10,
 	},
 });
 

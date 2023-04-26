@@ -11,6 +11,10 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		marginTop: 5,
 	},
+	logo: {
+		width: "39%",
+		height: 40,
+	},
 	titleText: {
 		fontSize: SIZES.large,
 		fontWeight: "bold",
@@ -21,10 +25,6 @@ const styles = StyleSheet.create({
 		fontSize: SIZES.large,
 		color: COLORS.primary,
 		fontFamily: FONT.semiBold,
-	},
-	logo: {
-		width: "35%",
-		height: 35,
 	},
 	title: {
 		fontSize: 24,

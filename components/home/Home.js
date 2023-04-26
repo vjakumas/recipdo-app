@@ -8,9 +8,8 @@ import { useNavigation } from "@react-navigation/native";
 import RecipeCardMediumList from "../common/cards/recipeCardMedium/RecipeCardMediumList";
 import ProfileDropdown from "../common/dropdown/profileDropdown/ProfileDropdown";
 
-const Home = () => {
+const Home = ({ navigation }) => {
 	const [name, setName] = useState("");
-	const navigation = useNavigation();
 
 	useEffect(() => {
 		firebase
@@ -21,7 +20,6 @@ const Home = () => {
 			.then((snapshot) => {
 				if (snapshot.exists) {
 					setName(snapshot.data());
-					console.log(name);
 				} else {
 					console.log("User does not exist");
 				}
@@ -100,46 +98,6 @@ const Home = () => {
 			cookingTime: 10,
 			ingredientsCount: 5,
 		},
-		{
-			id: 6,
-			image: "https://source.unsplash.com/random/?tacos",
-			type: "Lunch",
-			name: "Taco Tuesday",
-			cookingTime: 30,
-			ingredientsCount: 7,
-		},
-		{
-			id: 7,
-			image: "https://source.unsplash.com/random/?salad",
-			type: "Lunch",
-			name: "Fresh Salad",
-			cookingTime: 15,
-			ingredientsCount: 6,
-		},
-		{
-			id: 8,
-			image: "https://source.unsplash.com/random/?soup",
-			type: "Dinner",
-			name: "Hearty Soup",
-			cookingTime: 45,
-			ingredientsCount: 10,
-		},
-		{
-			id: 9,
-			image: "https://source.unsplash.com/random/?bbq",
-			type: "Dinner",
-			name: "BBQ Ribs",
-			cookingTime: 60,
-			ingredientsCount: 8,
-		},
-		{
-			id: 10,
-			image: "https://source.unsplash.com/random/?seafood",
-			type: "Dinner",
-			name: "Seafood Feast",
-			cookingTime: 40,
-			ingredientsCount: 12,
-		},
 	];
 
 	return (
@@ -165,7 +123,7 @@ const Home = () => {
 								<Text style={styles.seeAllText}>See all</Text>
 							</TouchableOpacity>
 						</View>
-						<RecipeCardMediumList recipes={sampleRecipes} />
+						<RecipeCardMediumList recipes={sampleRecipes} navigation={navigation} />
 					</View>
 
 					<View style={styles.categorySection}>
@@ -175,7 +133,7 @@ const Home = () => {
 								<Text style={styles.seeAllText}>See all</Text>
 							</TouchableOpacity>
 						</View>
-						<RecipeCardMediumList recipes={sampleRecipes} />
+						<RecipeCardMediumList recipes={sampleRecipes} navigation={navigation} />
 					</View>
 
 					<View style={styles.categorySection}>
@@ -185,7 +143,7 @@ const Home = () => {
 								<Text style={styles.seeAllText}>See all</Text>
 							</TouchableOpacity>
 						</View>
-						<RecipeCardMediumList recipes={sampleRecipes} />
+						<RecipeCardMediumList recipes={sampleRecipes} navigation={navigation} />
 					</View>
 
 					<View style={styles.categorySection}>
@@ -195,7 +153,7 @@ const Home = () => {
 								<Text style={styles.seeAllText}>See all</Text>
 							</TouchableOpacity>
 						</View>
-						<RecipeCardMediumList recipes={sampleRecipes} />
+						<RecipeCardMediumList recipes={sampleRecipes} navigation={navigation} />
 					</View>
 				</View>
 			</ScrollView>

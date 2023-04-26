@@ -10,6 +10,9 @@ const COLORS = {
 
 	white: "#F3F4F8",
 	lightWhite: "#FAFAFC",
+
+	warning: "#FFC542",
+	error: "#FF5C5C",
 };
 
 const FONT = {

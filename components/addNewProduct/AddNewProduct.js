@@ -195,6 +195,7 @@ const AddNewProduct = () => {
 				carbs,
 				fats,
 				protein,
+				isExpired: false,
 				isExpiringSoon: false,
 			};
 

@@ -1,34 +1,39 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, SafeAreaView, Image, FlatList, ActivityIndicator } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "./search.styles";
 import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
 import axios from "axios";
 import { LinearGradient } from "expo-linear-gradient";
 
-const RecipeCard = ({ recipe }) => {
+const RecipeCard = ({ recipe, onPress }) => {
 	return (
-		<View style={styles.recipeCard}>
-			<View style={{ overflow: "hidden" }}>
-				<Image source={{ uri: recipe.image }} style={styles.recipeImage} />
-				<LinearGradient colors={["transparent", "rgba(0, 0, 0, 0.8)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.overlay}>
-					<Text style={styles.recipeType}>
-						{recipe.dishTypes ? recipe.dishTypes[0].substring(0, 1).toUpperCase() + recipe.dishTypes[0].substring(1) : "Unknown"}
-					</Text>
-					<Text style={styles.recipeName}>{recipe.title}</Text>
-				</LinearGradient>
-				<View style={styles.infoBar}>
-					<View style={styles.infoItem}>
-						<View style={styles.greenDot} />
-						<Text style={styles.infoText}>{recipe.extendedIngredients.length} Ingredients</Text>
-					</View>
-					<View style={styles.infoItem}>
-						<Ionicons name="time-outline" size={16} color="white" />
-						<Text style={styles.infoText}>{recipe.readyInMinutes} min</Text>
+		<TouchableOpacity onPress={onPress}>
+			<View style={styles.recipeCard}>
+				<View style={{ overflow: "hidden" }}>
+					<Image source={{ uri: recipe.image }} style={styles.recipeImage} />
+					<LinearGradient colors={["transparent", "rgba(0, 0, 0, 0.8)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.overlay}>
+						<Text style={styles.recipeType}>
+							{recipe.dishTypes && recipe.dishTypes[0]
+								? recipe.dishTypes[0].substring(0, 1).toUpperCase() + recipe.dishTypes[0].substring(1)
+								: "Recipe"}
+						</Text>
+						<Text style={styles.recipeName}>{recipe.title}</Text>
+					</LinearGradient>
+					<View style={styles.infoBar}>
+						<View style={styles.infoItem}>
+							<View style={styles.greenDot} />
+							<Text style={styles.infoText}>{recipe.extendedIngredients.length} Ingredients</Text>
+						</View>
+						<View style={styles.infoItem}>
+							<Ionicons name="time-outline" size={16} color="white" />
+							<Text style={styles.infoText}>{recipe.readyInMinutes} min</Text>
+						</View>
 					</View>
 				</View>
 			</View>
-		</View>
+		</TouchableOpacity>
 	);
 };
 
@@ -38,6 +43,7 @@ const Search = () => {
 	const [searchResultsData, setSearchResultsData] = useState([]);
 	const [searchType, setSearchType] = useState("Name");
 	const [loading, setLoading] = useState(false);
+	const navigation = useNavigation();
 
 	const handleSearch = async () => {
 		if (!searchText) {
@@ -110,6 +116,10 @@ const Search = () => {
 		}
 	};
 
+	const onRecipePress = (recipe) => {
+		navigation.navigate("RecipeDetails", { recipe: recipe });
+	};
+
 	const renderSearchTypeButton = (type) => {
 		const isSelected = searchType === type;
 
@@ -149,7 +159,7 @@ const Search = () => {
 					<Text style={styles.searchResultsHeading}>Search Results</Text>
 				</View>
 			)}
-			{loading ? ( // Add this conditional rendering
+			{loading ? (
 				<ActivityIndicator size="large" style={{ marginTop: 225 }} color={COLORS.primary} />
 			) : (
 				<>
@@ -164,7 +174,7 @@ const Search = () => {
 						data={searchResultsData}
 						renderItem={({ item }) => (
 							<View key={item.id}>
-								<RecipeCard recipe={item} />
+								<RecipeCard recipe={item} onPress={() => onRecipePress(item)} />
 							</View>
 						)}
 						keyExtractor={(item) => item.id.toString()}
