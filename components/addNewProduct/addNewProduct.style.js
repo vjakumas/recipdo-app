@@ -160,38 +160,46 @@ const styles = StyleSheet.create({
 		marginTop: SIZES.medium,
 	},
 	submitButton: {
-		backgroundColor: COLORS.primary,
+		backgroundColor: COLORS.lightGray,
 		borderRadius: 15,
 		paddingHorizontal: SIZES.large,
 		paddingVertical: SIZES.medium,
 		alignItems: "center",
 		justifyContent: "center",
 		marginTop: SIZES.medium,
-		marginBottom: SIZES.medium,
+		marginBottom: SIZES.xxLarge,
 		marginHorizontal: SIZES.small,
 		position: "absolute",
 		bottom: 0,
 		left: 0,
 		right: 0,
+		...SHADOWS.xLarge,
 	},
 	submitButtonText: {
-		color: COLORS.white,
+		fontFamily: FONT.bold,
 		fontSize: SIZES.medium,
-		fontFamily: FONT.regular,
+		color: COLORS.white,
 	},
 	suggestionItem: {
+		flexDirection: "row",
+		alignItems: "center",
 		padding: 10,
 		borderBottomWidth: 1,
-		borderBottomColor: COLORS.gray,
+		borderBottomColor: COLORS.lightGray,
 		backgroundColor: COLORS.white,
+	},
+
+	suggestionText: {
+		marginLeft: 10,
+		fontSize: 16,
+		color: COLORS.darkGray,
 	},
 
 	suggestionsContainer: {
 		backgroundColor: COLORS.white,
 		borderRadius: 5,
-		borderWidth: 1,
-		borderColor: COLORS.gray,
 		marginTop: 5,
+		...SHADOWS.xxLarge,
 	},
 });
 

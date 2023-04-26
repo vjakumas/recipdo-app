@@ -50,10 +50,11 @@ const styles = StyleSheet.create({
 		padding: SIZES.small,
 		borderRadius: 10,
 		backgroundColor: COLORS.white,
-		borderColor: COLORS.primary,
+		borderColor: COLORS.white,
 		borderWidth: 1,
 		height: 50,
 		justifyContent: "center",
+		...SHADOWS.xLarge,
 		alignItems: "center",
 	},
 	buttonMargin: {
@@ -86,7 +87,6 @@ const styles = StyleSheet.create({
 		marginHorizontal: SIZES.small,
 		...SHADOWS.recipeCard,
 	},
-
 	recipeImage: {
 		height: 180,
 	},

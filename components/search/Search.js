@@ -12,7 +12,9 @@ const RecipeCard = ({ recipe }) => {
 			<View style={{ overflow: "hidden" }}>
 				<Image source={{ uri: recipe.image }} style={styles.recipeImage} />
 				<LinearGradient colors={["transparent", "rgba(0, 0, 0, 0.8)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.overlay}>
-					<Text style={styles.recipeType}>{recipe.dishTypes[0].substring(0, 1).toUpperCase() + recipe.dishTypes[0].substring(1)}</Text>
+					<Text style={styles.recipeType}>
+						{recipe.dishTypes ? recipe.dishTypes[0].substring(0, 1).toUpperCase() + recipe.dishTypes[0].substring(1) : "Unknown"}
+					</Text>
 					<Text style={styles.recipeName}>{recipe.title}</Text>
 				</LinearGradient>
 				<View style={styles.infoBar}>
@@ -158,7 +160,7 @@ const Search = () => {
 						</View>
 					)}
 					<FlatList
-						contentContainerStyle={styles.flatListContainer} // Add this line
+						contentContainerStyle={styles.flatListContainer}
 						data={searchResultsData}
 						renderItem={({ item }) => (
 							<View key={item.id}>

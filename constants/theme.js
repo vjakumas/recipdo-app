@@ -63,14 +63,25 @@ const SHADOWS = {
 		shadowRadius: 5.84,
 		elevation: 5,
 	},
+
 	xLarge: {
 		shadowColor: "#000",
 		shadowOffset: {
 			width: 0,
 			height: 10,
 		},
-		shadowOpacity: 0.1,
+		shadowOpacity: 0.05,
 		shadowRadius: 8.84,
+		elevation: 5,
+	},
+	xxLarge: {
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 10,
+		},
+		shadowOpacity: 0.15,
+		shadowRadius: 5.84,
 		elevation: 5,
 	},
 };

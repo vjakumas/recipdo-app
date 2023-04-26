@@ -144,19 +144,19 @@ const Home = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<ScrollView showsVerticalScrollIndicator={false}>
-				<View style={styles.topBar}>
-					<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} />
-					<View style={styles.rightIcons}>
-						<Ionicons name="notifications-outline" size={24} color={COLORS.darkGray} style={styles.notificationIcon} />
-						<ProfileDropdown
-							ref={profileDropdownRef}
-							handleSettings={handleSettings}
-							handleLogout={handleLogout}
-							handleStatistics={handleStatistics}
-						/>
-					</View>
+			<View style={styles.topBar}>
+				<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} />
+				<View style={styles.rightIcons}>
+					<Ionicons name="notifications-outline" size={24} color={COLORS.darkGray} style={styles.notificationIcon} />
+					<ProfileDropdown
+						ref={profileDropdownRef}
+						handleSettings={handleSettings}
+						handleLogout={handleLogout}
+						handleStatistics={handleStatistics}
+					/>
 				</View>
+			</View>
+			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={styles.recipesContainer}>
 					<View style={styles.categorySection}>
 						<View style={styles.categoryHeader}>
