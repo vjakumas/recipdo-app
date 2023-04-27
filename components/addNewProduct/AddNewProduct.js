@@ -18,7 +18,7 @@ const AddNewProduct = () => {
 	const [carbs, setCarbs] = useState("");
 	const [fats, setFats] = useState("");
 	const [protein, setProtein] = useState("");
-	const [searchText, setSearchText] = useState("");
+	const [name, setSearchText] = useState("");
 	const [searchTimeout, setSearchTimeout] = useState(null);
 	const [suggestions, setSuggestions] = useState([]);
 	const [showSuggestions, setShowSuggestions] = useState(false);
@@ -42,15 +42,15 @@ const AddNewProduct = () => {
 	];
 
 	useEffect(() => {
-		setIsSubmitDisabled(!searchText || !quantity);
-	}, [searchText, quantity]);
+		setIsSubmitDisabled(!name || !quantity);
+	}, [name, quantity]);
 
 	useEffect(() => {
 		if (searchTimeout) {
 			clearTimeout(searchTimeout);
 		}
 
-		if (searchText.length > 0) {
+		if (name.length > 0) {
 			setSearchTimeout(
 				setTimeout(() => {
 					getSuggestions();
@@ -59,11 +59,11 @@ const AddNewProduct = () => {
 		} else {
 			setSuggestions([]);
 		}
-	}, [searchText]);
+	}, [name]);
 
 	useEffect(() => {
 		updateButtonColor();
-	}, [searchText, unit, quantity]);
+	}, [name, unit, quantity]);
 
 	const SuggestionItem = ({ suggestion, onPress }) => {
 		return (
@@ -78,7 +78,7 @@ const AddNewProduct = () => {
 		try {
 			const response = await axios.get("https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/food/ingredients/autocomplete", {
 				params: {
-					query: searchText,
+					query: name,
 					number: "8",
 				},
 				headers: {
@@ -94,11 +94,11 @@ const AddNewProduct = () => {
 		}
 	};
 
-	const fetchProductImage = async (searchText) => {
+	const fetchProductImage = async (name) => {
 		try {
 			const response = await axios.get(`https://world.openfoodfacts.org/cgi/search.pl`, {
 				params: {
-					search_terms: searchText,
+					search_terms: name,
 					search_simple: 1,
 					action: "process",
 					json: 1,
@@ -130,7 +130,7 @@ const AddNewProduct = () => {
 	};
 
 	const updateButtonColor = () => {
-		if (searchText && unit && quantity) {
+		if (name && unit && quantity) {
 			setSubmitButtonColor(COLORS.primary);
 		} else {
 			setSubmitButtonColor(COLORS.gray2);
@@ -164,18 +164,18 @@ const AddNewProduct = () => {
 
 	const handleSubmit = async () => {
 		try {
-			if (!searchText || !quantity) {
-				alert("Please provide both searchText and quantity.");
+			if (!name || !quantity) {
+				alert("Please provide both name and quantity.");
 				return;
 			}
 
-			const recipeExists = await checkRecipeExists(searchText);
+			const recipeExists = await checkRecipeExists(name);
 			if (!recipeExists) {
 				alert("Product name is not valid. Please try again");
 				return;
 			}
 
-			const productImageURL = await fetchProductImage(searchText);
+			const productImageURL = await fetchProductImage(name);
 			const addedDate = new Date();
 			const userId = firebase.auth().currentUser.uid;
 
@@ -186,7 +186,7 @@ const AddNewProduct = () => {
 			const newPantryItem = {
 				pantryId: Date.now().toString(),
 				productImageURL,
-				searchText,
+				name,
 				quantity,
 				date,
 				unit,
@@ -224,7 +224,7 @@ const AddNewProduct = () => {
 					</View>
 					<TextInput
 						style={styles.searchInput}
-						value={searchText}
+						value={name}
 						onChangeText={(text) => setSearchText(text)}
 						placeholder="Search..."
 						returnKeyType="search"

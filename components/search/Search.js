@@ -56,7 +56,7 @@ const Search = () => {
 		let url = "";
 		let options = {};
 		if (searchType === "Name") {
-			url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/searchComplex";
+			url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/search";
 			options = {
 				method: "GET",
 				url: url,
