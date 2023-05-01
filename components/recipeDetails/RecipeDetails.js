@@ -19,12 +19,10 @@ const RecipeDetails = ({ route }) => {
 	const [nutritionData, setNutritionData] = useState(null);
 	const [isSaved, setIsSaved] = useState(false);
 	const [ingredientAvailability, setIngredientAvailability] = useState([]);
-	const [availableIngredientsData, setAvailableIngredientsData] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const fetchData = async () => {
-			setIngredientAvailability([]);
 			await fetchPantryList();
 			await fetchIngredients();
 			await checkIfRecipeIsSaved();
@@ -33,9 +31,12 @@ const RecipeDetails = ({ route }) => {
 		};
 		setIsLoading(true);
 		fetchData();
+		setIngredientAvailability([]);
 	}, [recipe]);
 
 	useEffect(() => {
+		let isCancelled = false;
+
 		const updateIngredientAvailability = async () => {
 			if (ingredients.length === 0 || pantryItems.length === 0) {
 				return;
@@ -46,11 +47,18 @@ const RecipeDetails = ({ route }) => {
 					return await isIngredientAvailable(ingredient);
 				})
 			);
-			console.log("Ingredient Availability:", availability);
-			setIngredientAvailability(availability);
+
+			if (!isCancelled) {
+				console.log("Ingredient Availability:", availability);
+				setIngredientAvailability(availability);
+			}
 		};
-		setIngredientAvailability([]);
+
 		updateIngredientAvailability();
+
+		return () => {
+			isCancelled = true;
+		};
 	}, [pantryItems, ingredients]);
 
 	const toggleSaveRecipe = async () => {
@@ -117,40 +125,33 @@ const RecipeDetails = ({ route }) => {
 			console.error(error);
 		}
 	};
-	const isIngredientAvailable = async (ingredient) => {
-		const pantryItem = pantryItems.find((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
 
-		if (pantryItem === undefined) {
+	const isIngredientAvailable = async (ingredient) => {
+		const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
+		if (matchingPantryItems.length === 0) {
 			return false;
 		}
 
-		const convertedAmount = await convertIngredientAmount(
+		let totalPantryItemQuantity = 0;
+		for (const item of matchingPantryItems) {
+			const convertedAmount = await convertIngredientAmount(ingredient.name, ingredient.amount.metric.unit, item.unit, item.quantity);
+			totalPantryItemQuantity += convertedAmount || 0;
+		}
+
+		const convertedIngredientAmount = await convertIngredientAmount(
 			ingredient.name,
-			pantryItem.unit,
+			matchingPantryItems[0].unit,
 			ingredient.amount.metric.unit,
 			ingredient.amount.metric.value
 		);
 
-		if (convertedAmount === null) {
+		if (convertedIngredientAmount === null) {
 			console.error("Error converting ingredient amount");
 			return false;
 		}
-		console.log(pantryItem.quantity + "  " + convertedAmount);
+		console.log(totalPantryItemQuantity + "  " + convertedIngredientAmount);
 
-		const isAvailable = pantryItem.quantity >= convertedAmount;
-
-		if (isAvailable) {
-			setAvailableIngredientsData((prevState) => [
-				...prevState,
-				{
-					name: ingredient.name,
-					originalQuantity: pantryItem.quantity,
-					recipeNeededQuantity: convertedAmount,
-				},
-			]);
-		}
-
-		return isAvailable;
+		return totalPantryItemQuantity >= convertedIngredientAmount;
 	};
 
 	const checkIfRecipeIsSaved = async () => {
