@@ -160,8 +160,7 @@ const RecipeDetails = ({ route }) => {
 
 		// If the ingredient has a 'unit' measurement, sum the total pantry item quantity without conversion
 		if (ingredientUnit === "unit") {
-			totalPantryItemQuantity = matchingPantryItems.reduce((acc, item) => acc + item.quantity, 0);
-			console.log(parseInt(totalPantryItemQuantity), parseInt(ingredient.amount.metric.value));
+			totalPantryItemQuantity = parseInt(matchingPantryItems.reduce((acc, item) => parseInt(acc) + parseInt(item.quantity), 0));
 			if (parseInt(totalPantryItemQuantity) >= parseInt(ingredient.amount.metric.value) === true) {
 				return true;
 			}
@@ -174,6 +173,13 @@ const RecipeDetails = ({ route }) => {
 			const convertedAmount = await convertIngredientAmount(ingredient.name, ingredientUnit, item.unit, item.quantity);
 			console.log(ingredient.name, ingredientUnit, item.unit, item.quantity);
 			totalPantryItemQuantity += convertedAmount || 0;
+		}
+
+		if (!isCommonMeasurement(ingredient.amount.metric.unit) && ingredient.amount.metric.unit === "unit") {
+			for (const item of matchingPantryItems) {
+				totalPantryItemQuantity += parseInt(item.quantity);
+			}
+			return totalPantryItemQuantity >= parseInt(ingredient.amount.metric.value);
 		}
 
 		const convertedIngredientAmount = await convertIngredientAmount(
