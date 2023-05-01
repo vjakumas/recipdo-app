@@ -149,7 +149,6 @@ const RecipeDetails = ({ route }) => {
 			console.error("Error converting ingredient amount");
 			return false;
 		}
-		console.log(totalPantryItemQuantity + "  " + convertedIngredientAmount);
 
 		return totalPantryItemQuantity >= convertedIngredientAmount;
 	};
@@ -190,6 +189,21 @@ const RecipeDetails = ({ route }) => {
 		}
 	};
 
+	const getTotalPantryQuantity = (ingredientName) => {
+		const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredientName.toLowerCase().trim());
+
+		if (matchingPantryItems.length === 0) {
+			return 0;
+		}
+
+		let totalPantryItemQuantity = 0;
+		for (const item of matchingPantryItems) {
+			totalPantryItemQuantity += item.quantity;
+		}
+
+		return totalPantryItemQuantity;
+	};
+
 	const finishRecipe = async (recipeId) => {
 		const userId = firebase.auth().currentUser.uid;
 		const userRef = firestore.collection("users").doc(userId);
@@ -198,7 +212,8 @@ const RecipeDetails = ({ route }) => {
 			await userRef.update({
 				finishedRecipes: firebase.firestore.FieldValue.arrayUnion(recipeId),
 			});
-			alert("Recipe marked as finished!");
+			await subtractIngredients();
+			alert("Recipe marked as finished and ingredients subtracted!");
 		} catch (error) {
 			console.error("Error marking recipe as finished:", error);
 		}
@@ -209,20 +224,79 @@ const RecipeDetails = ({ route }) => {
 			return <Text>Loading ingredients...</Text>;
 		}
 
-		return ingredients.map((ingredient, index) => (
-			<View style={styles.ingredientRow} key={index}>
-				<FontAwesome
-					name={ingredientAvailability[index] ? "chevron-circle-down" : "circle-o"}
-					size={24}
-					color={ingredientAvailability[index] ? COLORS.primary : COLORS.lightGray}
-					style={styles.ingredientIcon}
-				/>
-				<Text style={[styles.text, ingredientAvailability[index] ? styles.strikethroughText : null]}>
-					<Text style={styles.boldText}>{ingredient.amount.metric.value}</Text>{" "}
-					<Text style={styles.boldText}>{ingredient.amount.metric.unit}</Text> {ingredient.name}
-				</Text>
-			</View>
-		));
+		return ingredients.map((ingredient, index) => {
+			const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
+
+			const totalPantryQuantity = matchingPantryItems.reduce((total, item) => total + item.quantity, 0);
+
+			return (
+				<View style={styles.ingredientRow} key={index}>
+					<FontAwesome
+						name={ingredientAvailability[index] ? "chevron-circle-down" : "circle-o"}
+						size={24}
+						color={ingredientAvailability[index] ? COLORS.primary : COLORS.lightGray}
+						style={styles.ingredientIcon}
+					/>
+					<Text style={[styles.text, ingredientAvailability[index] ? styles.strikethroughText : null]}>
+						<Text style={styles.boldText}>{ingredient.amount.metric.value}</Text>{" "}
+						<Text style={styles.boldText}>{ingredient.amount.metric.unit}</Text> {ingredient.name}{" "}
+						<Text style={{ color: "gray" }}>({totalPantryQuantity}g)</Text>
+					</Text>
+				</View>
+			);
+		});
+	};
+
+	const subtractIngredients = async () => {
+		const userId = firebase.auth().currentUser.uid;
+		const userRef = firestore.collection("users").doc(userId);
+
+		for (const ingredient of ingredients) {
+			const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
+
+			if (matchingPantryItems.length > 0) {
+				matchingPantryItems.sort((a, b) => new Date(a.date) - new Date(b.date));
+				let remainingAmount = ingredient.amount.metric.value;
+				console.log("REMAINING: " + remainingAmount);
+				for (const pantryItem of matchingPantryItems) {
+					const convertedAmount = await convertIngredientAmount(
+						ingredient.name,
+						ingredient.amount.metric.unit,
+						pantryItem.unit,
+						pantryItem.quantity
+					);
+					if (convertedAmount >= remainingAmount) {
+						const convertedAmountToOriginal = await convertIngredientAmount(
+							ingredient.name,
+							pantryItem.unit,
+							ingredient.amount.metric.unit,
+							convertedAmount - remainingAmount
+						);
+						pantryItem.quantity = convertedAmountToOriginal;
+						remainingAmount = 0;
+					} else {
+						remainingAmount -= pantryItem.quantity;
+						pantryItem.quantity = 0;
+						remainingAmount -= convertedAmount;
+
+						// Find the index of the pantryItem in the pantryItems array
+						const index = pantryItems.indexOf(pantryItem);
+						if (index !== -1) {
+							// Remove the pantryItem from the pantryItems array
+							pantryItems.splice(index, 1);
+						}
+					}
+
+					if (remainingAmount <= 0) {
+						break;
+					}
+				}
+
+				await userRef.update({
+					pantryItems: pantryItems,
+				});
+			}
+		}
 	};
 
 	const renderInstructions = () => {
@@ -278,7 +352,6 @@ const RecipeDetails = ({ route }) => {
 						</View>
 						{nutritionData && (
 							<View style={styles.nutritionContainer}>
-								<Text style={styles.nutritionTitle}>{recipe.id}</Text>
 								<Text style={styles.nutritionTitle}>Nutrition Facts</Text>
 								<View style={styles.nutritionRow}>
 									<View style={styles.nutritionItem}>
