@@ -126,6 +126,12 @@ const RecipeDetails = ({ route }) => {
 		}
 	};
 
+	// Helper function to check if a unit is a common measurement
+	const isCommonMeasurement = (unit) => {
+		const commonMeasurements = ["g", "ml", "kg", "l", "oz", "cup", "tsp", "tbsp", "pint", "quart", "gallon"];
+		return commonMeasurements.includes(unit.toLowerCase());
+	};
+
 	const isIngredientAvailable = async (ingredient) => {
 		const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
 		if (matchingPantryItems.length === 0) {
@@ -133,16 +139,47 @@ const RecipeDetails = ({ route }) => {
 		}
 
 		let totalPantryItemQuantity = 0;
+
+		const ingredientUnit = ingredient.amount.metric.unit || "unit";
+
+		// If the ingredient's unit is not a common measurement, try to convert it to grams
+		if (!isCommonMeasurement(ingredientUnit)) {
+			try {
+				const convertedIngredient = await convertIngredientAmount(ingredient.name, ingredientUnit, "g", ingredient.amount.metric.value);
+				if (convertedIngredient) {
+					ingredient.amount.metric.unit = "g";
+					ingredient.amount.metric.value = convertedIngredient;
+				} else {
+					ingredient.amount.metric.unit = "unit";
+				}
+			} catch (error) {
+				console.error("Error converting uncommon unit to grams:", error);
+				ingredient.amount.metric.unit = "unit";
+			}
+		}
+
+		// If the ingredient has a 'unit' measurement, sum the total pantry item quantity without conversion
+		if (ingredientUnit === "unit") {
+			totalPantryItemQuantity = matchingPantryItems.reduce((acc, item) => acc + item.quantity, 0);
+			console.log(parseInt(totalPantryItemQuantity), parseInt(ingredient.amount.metric.value));
+			if (parseInt(totalPantryItemQuantity) >= parseInt(ingredient.amount.metric.value) === true) {
+				return true;
+			}
+		}
+
 		for (const item of matchingPantryItems) {
-			const convertedAmount = await convertIngredientAmount(ingredient.name, ingredient.amount.metric.unit, item.unit, item.quantity);
-			console.log(ingredient.name, ingredient.amount.metric.unit, item.unit, item.quantity);
+			if (item.unit === "unit") {
+				continue;
+			}
+			const convertedAmount = await convertIngredientAmount(ingredient.name, ingredientUnit, item.unit, item.quantity);
+			console.log(ingredient.name, ingredientUnit, item.unit, item.quantity);
 			totalPantryItemQuantity += convertedAmount || 0;
 		}
 
 		const convertedIngredientAmount = await convertIngredientAmount(
 			ingredient.name,
 			matchingPantryItems[0].unit,
-			ingredient.amount.metric.unit,
+			ingredientUnit,
 			ingredient.amount.metric.value
 		);
 
