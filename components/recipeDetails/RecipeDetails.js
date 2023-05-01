@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, ScrollView, TouchableOpacity, SafeAreaView } from "react-native";
+import { View, Text, Image, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator } from "react-native";
+import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
 import styles from "./recipeDetails.style";
 import firebase, { firestore } from "../../config/firebase/config";
-import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
+import Constants from "expo-constants";
 
 const RecipeDetails = ({ route }) => {
 	const { recipe } = route.params;
@@ -18,15 +19,37 @@ const RecipeDetails = ({ route }) => {
 	const [nutritionData, setNutritionData] = useState(null);
 	const [isSaved, setIsSaved] = useState(false);
 	const [ingredientAvailability, setIngredientAvailability] = useState([]);
+	const [availableIngredientsData, setAvailableIngredientsData] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-		checkIfRecipeIsSaved();
-		fetchNutritionData();
-		fetchIngredients();
-		fetchPantryList();
+		const fetchData = async () => {
+			setIngredientAvailability([]);
+			await fetchPantryList();
+			await fetchIngredients();
+			await checkIfRecipeIsSaved();
+			await fetchNutritionData();
+			setIsLoading(false);
+		};
+		setIsLoading(true);
+		fetchData();
 	}, [recipe]);
 
 	useEffect(() => {
+		const updateIngredientAvailability = async () => {
+			if (ingredients.length === 0 || pantryItems.length === 0) {
+				return;
+			}
+
+			const availability = await Promise.all(
+				ingredients.map(async (ingredient) => {
+					return await isIngredientAvailable(ingredient);
+				})
+			);
+			console.log("Ingredient Availability:", availability);
+			setIngredientAvailability(availability);
+		};
+		setIngredientAvailability([]);
 		updateIngredientAvailability();
 	}, [pantryItems, ingredients]);
 
@@ -64,7 +87,7 @@ const RecipeDetails = ({ route }) => {
 			url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${recipe.id}/ingredientWidget.json`,
 			headers: {
 				"content-type": "application/octet-stream",
-				"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+				"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 			},
 		};
@@ -84,7 +107,7 @@ const RecipeDetails = ({ route }) => {
 				{
 					headers: {
 						"content-type": "application/octet-stream",
-						"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+						"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 						"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 					},
 				}
@@ -94,29 +117,13 @@ const RecipeDetails = ({ route }) => {
 			console.error(error);
 		}
 	};
-
-	const updateIngredientAvailability = async () => {
-		if (ingredients.length === 0 || pantryItems.length === 0) {
-			return;
-		}
-
-		const availability = await Promise.all(
-			ingredients.map(async (ingredient) => {
-				return await isIngredientAvailable(ingredient);
-			})
-		);
-
-		setIngredientAvailability(availability);
-	};
-
 	const isIngredientAvailable = async (ingredient) => {
-		const pantryItem = pantryItems.find((item) => item.name === ingredient.name);
+		const pantryItem = pantryItems.find((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
 
 		if (pantryItem === undefined) {
 			return false;
 		}
 
-		// Convert the ingredient amount to the pantryItem's unit
 		const convertedAmount = await convertIngredientAmount(
 			ingredient.name,
 			pantryItem.unit,
@@ -130,7 +137,20 @@ const RecipeDetails = ({ route }) => {
 		}
 		console.log(pantryItem.quantity + "  " + convertedAmount);
 
-		return pantryItem.quantity >= convertedAmount;
+		const isAvailable = pantryItem.quantity >= convertedAmount;
+
+		if (isAvailable) {
+			setAvailableIngredientsData((prevState) => [
+				...prevState,
+				{
+					name: ingredient.name,
+					originalQuantity: pantryItem.quantity,
+					recipeNeededQuantity: convertedAmount,
+				},
+			]);
+		}
+
+		return isAvailable;
 	};
 
 	const checkIfRecipeIsSaved = async () => {
@@ -155,7 +175,7 @@ const RecipeDetails = ({ route }) => {
 			},
 			headers: {
 				"content-type": "application/octet-stream",
-				"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+				"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 			},
 		};
@@ -169,15 +189,38 @@ const RecipeDetails = ({ route }) => {
 		}
 	};
 
+	const finishRecipe = async (recipeId) => {
+		const userId = firebase.auth().currentUser.uid;
+		const userRef = firestore.collection("users").doc(userId);
+
+		try {
+			await userRef.update({
+				finishedRecipes: firebase.firestore.FieldValue.arrayUnion(recipeId),
+			});
+			alert("Recipe marked as finished!");
+		} catch (error) {
+			console.error("Error marking recipe as finished:", error);
+		}
+	};
+
 	const renderIngredients = () => {
 		if (!nutritionData) {
 			return <Text>Loading ingredients...</Text>;
 		}
 
 		return ingredients.map((ingredient, index) => (
-			<Text key={index} style={[styles.text, ingredientAvailability[index] ? styles.strikethroughText : null]}>
-				{ingredient.amount.metric.value} {ingredient.amount.metric.unit} {ingredient.name}
-			</Text>
+			<View style={styles.ingredientRow} key={index}>
+				<FontAwesome
+					name={ingredientAvailability[index] ? "chevron-circle-down" : "circle-o"}
+					size={24}
+					color={ingredientAvailability[index] ? COLORS.primary : COLORS.lightGray}
+					style={styles.ingredientIcon}
+				/>
+				<Text style={[styles.text, ingredientAvailability[index] ? styles.strikethroughText : null]}>
+					<Text style={styles.boldText}>{ingredient.amount.metric.value}</Text>{" "}
+					<Text style={styles.boldText}>{ingredient.amount.metric.unit}</Text> {ingredient.name}
+				</Text>
+			</View>
 		));
 	};
 
@@ -204,71 +247,80 @@ const RecipeDetails = ({ route }) => {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<ScrollView showsVerticalScrollIndicator={false}>
-				<View>
-					<Image style={styles.image} source={{ uri: image }} />
-					<View style={styles.dishTypeContainer}>
-						<Text style={styles.dishType}>{dishType}</Text>
-					</View>
-					<View style={styles.readyInMinutesContainer}>
-						<Text style={styles.readyInMinutes}>
-							<MaterialIcons name="timer" size={16} color="white" /> {readyInMinutes} min
-						</Text>
-					</View>
+			{isLoading ? (
+				<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+					<ActivityIndicator size="large" color={COLORS.primary} />
 				</View>
-				<View style={styles.container}>
-					<View style={styles.header}>
-						<Text style={styles.title}>{title}</Text>
-						<TouchableOpacity onPress={toggleSaveRecipe}>
-							{isSaved ? (
-								<MaterialIcons name="favorite" size={24} color="red" />
-							) : (
-								<MaterialIcons name="favorite-border" size={24} color="red" />
-							)}
+			) : (
+				<ScrollView showsVerticalScrollIndicator={false}>
+					<View>
+						<Image style={styles.image} source={{ uri: image }} />
+						<View style={styles.dishTypeContainer}>
+							<Text style={styles.dishType}>{dishType}</Text>
+						</View>
+						<View style={styles.readyInMinutesContainer}>
+							<Text style={styles.readyInMinutes}>
+								<MaterialIcons name="timer" size={16} color="white" /> {readyInMinutes} min
+							</Text>
+						</View>
+					</View>
+					<View style={styles.container}>
+						<View style={styles.header}>
+							<Text style={styles.title}>{title}</Text>
+							<TouchableOpacity style={styles.saveRecipeButton} onPress={toggleSaveRecipe}>
+								{isSaved ? (
+									<MaterialIcons name="favorite" size={24} color="red" />
+								) : (
+									<MaterialIcons name="favorite-border" size={24} color="red" />
+								)}
+							</TouchableOpacity>
+						</View>
+						{nutritionData && (
+							<View style={styles.nutritionContainer}>
+								<Text style={styles.nutritionTitle}>{recipe.id}</Text>
+								<Text style={styles.nutritionTitle}>Nutrition Facts</Text>
+								<View style={styles.nutritionRow}>
+									<View style={styles.nutritionItem}>
+										<View style={styles.nutritionIcon}>
+											<MaterialIcons name="local-fire-department" size={24} color={COLORS.secondary} />
+										</View>
+										<Text style={styles.nutritionText}>{nutritionData.calories} Kcal</Text>
+									</View>
+									<View style={styles.nutritionItem}>
+										<View style={styles.nutritionIcon}>
+											<MaterialIcons name="free-breakfast" size={24} color={COLORS.secondary} />
+										</View>
+										<Text style={styles.nutritionText}>{nutritionData.carbs} carbs</Text>
+									</View>
+								</View>
+								<View style={styles.nutritionRow}>
+									<View style={styles.nutritionItem}>
+										<View style={styles.nutritionIcon}>
+											<MaterialIcons name="fitness-center" size={24} color={COLORS.secondary} />
+										</View>
+										<Text style={styles.nutritionText}>{nutritionData.protein} protein</Text>
+									</View>
+									<View style={styles.nutritionItem}>
+										<View style={styles.nutritionIcon}>
+											<MaterialIcons name="fastfood" size={24} color={COLORS.secondary} />
+										</View>
+										<Text style={styles.nutritionText}>{nutritionData.fat} fat</Text>
+									</View>
+								</View>
+							</View>
+						)}
+						<View style={styles.ingredientsContainer}>
+							<Text style={styles.ingredientsTitle}>Ingredients</Text>
+							{renderIngredients()}
+						</View>
+						<Text style={styles.instructionsTitle}>Instructions</Text>
+						{renderInstructions()}
+						<TouchableOpacity style={styles.submitButton} onPress={() => finishRecipe(recipe.id)}>
+							<Text style={styles.submitButtonText}>Finish recipe</Text>
 						</TouchableOpacity>
 					</View>
-					{nutritionData && (
-						<View style={styles.nutritionContainer}>
-							<Text style={styles.nutritionTitle}>{recipe.id}</Text>
-							<Text style={styles.nutritionTitle}>Nutrition Facts</Text>
-							<View style={styles.nutritionRow}>
-								<View style={styles.nutritionItem}>
-									<View style={styles.nutritionIcon}>
-										<MaterialIcons name="local-fire-department" size={24} color={COLORS.secondary} />
-									</View>
-									<Text style={styles.nutritionText}>{nutritionData.calories} Kcal</Text>
-								</View>
-								<View style={styles.nutritionItem}>
-									<View style={styles.nutritionIcon}>
-										<MaterialIcons name="free-breakfast" size={24} color={COLORS.secondary} />
-									</View>
-									<Text style={styles.nutritionText}>{nutritionData.carbs} carbs</Text>
-								</View>
-							</View>
-							<View style={styles.nutritionRow}>
-								<View style={styles.nutritionItem}>
-									<View style={styles.nutritionIcon}>
-										<MaterialIcons name="fitness-center" size={24} color={COLORS.secondary} />
-									</View>
-									<Text style={styles.nutritionText}>{nutritionData.protein} protein</Text>
-								</View>
-								<View style={styles.nutritionItem}>
-									<View style={styles.nutritionIcon}>
-										<MaterialIcons name="fastfood" size={24} color={COLORS.secondary} />
-									</View>
-									<Text style={styles.nutritionText}>{nutritionData.fat} fat</Text>
-								</View>
-							</View>
-						</View>
-					)}
-					<View style={styles.ingredientsContainer}>
-						<Text style={styles.ingredientsTitle}>Ingredients</Text>
-						{renderIngredients()}
-					</View>
-					<Text style={styles.instructionsTitle}>Instructions</Text>
-					{renderInstructions()}
-				</View>
-			</ScrollView>
+				</ScrollView>
+			)}
 		</SafeAreaView>
 	);
 };

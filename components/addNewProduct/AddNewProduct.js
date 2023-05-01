@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, Image, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { View, Alert, Text, TextInput, TouchableOpacity, SafeAreaView, Image, Keyboard, TouchableWithoutFeedback } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import RNPickerSelect from "react-native-picker-select";
@@ -206,7 +206,7 @@ const AddNewProduct = () => {
 			});
 
 			console.log("Product added successfully");
-			alert("Product added successfully");
+			Alert.alert("Success", "Product added successfully", [{ text: "OK", onPress: () => console.log("OK Pressed") }], { cancelable: false });
 		} catch (error) {
 			console.error("Error adding product:", error);
 		}

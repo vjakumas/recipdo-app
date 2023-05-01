@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, FlatList, Image, TouchableOpacity, SafeAreaView } from "react-native";
+import { View, Text, FlatList, Image, TouchableOpacity, SafeAreaView, ActivityIndicator, RefreshControl } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "./savedRecipes.style";
@@ -10,39 +10,61 @@ import { useNavigation } from "@react-navigation/native";
 
 const SavedRecipes = () => {
 	const [recipes, setRecipes] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
 	const navigation = useNavigation();
 
 	useEffect(() => {
-		const fetchSavedRecipes = async () => {
-			try {
-				const userId = firebase.auth().currentUser.uid;
-				const userDoc = await firestore.collection("users").doc(userId).get();
-				const savedRecipeIds = userDoc.data().savedRecipes.join(",");
-				console.log(userDoc.data().savedRecipes);
-				const options = {
-					method: "GET",
-					url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk",
-					params: { ids: savedRecipeIds },
-					headers: {
-						"content-type": "application/octet-stream",
-						"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
-						"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-					},
-				};
-
-				const response = await axios.request(options);
-				setRecipes(response.data);
-			} catch (error) {
-				console.error("Error fetching saved recipes:", error);
-			}
-		};
-
 		fetchSavedRecipes();
 	}, []);
+
+	const fetchSavedRecipes = async () => {
+		try {
+			const userId = firebase.auth().currentUser.uid;
+			const userDoc = await firestore.collection("users").doc(userId).get();
+			const savedRecipeIds = userDoc.data().savedRecipes.join(",");
+			console.log(userDoc.data().savedRecipes);
+			const options = {
+				method: "GET",
+				url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk",
+				params: { ids: savedRecipeIds },
+				headers: {
+					"content-type": "application/octet-stream",
+					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+				},
+			};
+
+			const response = await axios.request(options);
+			setRecipes(response.data);
+		} catch (error) {
+			console.error("Error fetching saved recipes:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handleRefresh = async () => {
+		setRefreshing(true);
+		await fetchSavedRecipes();
+		setRefreshing(false);
+	};
 
 	const onRecipePress = (recipe) => {
 		navigation.navigate("RecipeDetails", { recipe });
 	};
+
+	if (isLoading) {
+		return (
+			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+				<View style={styles.logoContainer}>
+					<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} />
+				</View>
+				<ActivityIndicator size="large" color={COLORS.primary} />
+				<Text style={{ marginTop: SIZES.small, fontFamily: FONT.semiBold, color: COLORS.gray }}>Loading your favourite recipes...</Text>
+			</View>
+		);
+	}
 
 	const RecipeCard = ({ recipe, onPress }) => {
 		return (
@@ -102,6 +124,7 @@ const SavedRecipes = () => {
 					keyExtractor={(item) => item.id.toString()}
 					showsVerticalScrollIndicator={false}
 					contentContainerStyle={{ paddingBottom: SIZES.medium }}
+					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
 				/>
 			</View>
 		</SafeAreaView>

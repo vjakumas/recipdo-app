@@ -33,13 +33,15 @@ const ProductCardMedium = ({ product }) => {
 
 	const textColor = getTextColor();
 
+	console.log(product);
+
 	return (
 		<View style={styles.card}>
 			<View style={{ overflow: "hidden" }}>
 				<Image source={{ uri: product.productImageURL }} style={styles.image} />
 				<LinearGradient colors={["transparent", "rgba(0, 0, 0, 0.8)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.gradient} />
 				<View style={styles.textOverlay}>
-					<Text style={styles.overlayText}>{product.searchText.charAt(0).toUpperCase() + product.searchText.slice(1)}</Text>
+					<Text style={styles.overlayText}>{product.name ? product.name.charAt(0).toUpperCase() + product.name.slice(1) : ""}</Text>
 				</View>
 			</View>
 			<View style={styles.infoBar}>

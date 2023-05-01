@@ -26,8 +26,11 @@ const styles = StyleSheet.create({
 		marginBottom: 16,
 	},
 	title: {
+		flex: 1, // Add this line
 		fontSize: 24,
 		fontWeight: "bold",
+		marginRight: 8, // Add some margin to the right
+		flexWrap: "wrap", // Add this line
 	},
 	saveRecipeButton: {
 		paddingLeft: 8,
@@ -64,7 +67,7 @@ const styles = StyleSheet.create({
 	},
 	text: {
 		fontSize: 16,
-		marginBottom: 8,
+		marginLeft: 10,
 	},
 	nutritionContainer: {
 		marginTop: 16,
@@ -107,6 +110,18 @@ const styles = StyleSheet.create({
 		fontFamily: FONT.bold,
 		marginBottom: 15,
 	},
+	ingredientRow: {
+		flexDirection: "row",
+		justifyContent: "flex-start",
+		alignItems: "center",
+		marginBottom: SIZES.xSmall,
+	},
+	boldText: {
+		fontWeight: "bold",
+	},
+	ingredientIcon: {
+		marginRight: SIZES.margin,
+	},
 	instructionsTitle: {
 		marginTop: 15,
 		fontSize: 20,
@@ -146,6 +161,21 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexWrap: "wrap",
 		alignContent: "flex-end",
+	},
+	submitButton: {
+		width: "100%",
+		height: 65,
+		backgroundColor: COLORS.darkGray,
+		borderRadius: SIZES.medium,
+		justifyContent: "center",
+		alignItems: "center",
+		marginTop: 25,
+		...SHADOWS.xLarge,
+	},
+	submitButtonText: {
+		fontFamily: FONT.bold,
+		fontSize: SIZES.medium,
+		color: COLORS.white,
 	},
 });
 
