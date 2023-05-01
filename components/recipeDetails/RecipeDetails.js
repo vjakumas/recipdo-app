@@ -227,7 +227,15 @@ const RecipeDetails = ({ route }) => {
 		return ingredients.map((ingredient, index) => {
 			const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
 
-			const totalPantryQuantity = matchingPantryItems.reduce((total, item) => total + item.quantity, 0);
+			let pantryQuantityDisplay;
+
+			if (ingredient.amount.metric.unit === "" && matchingPantryItems[0] === undefined) {
+				pantryQuantityDisplay = "0 units";
+			} else {
+				pantryQuantityDisplay = matchingPantryItems.length
+					? `${matchingPantryItems[0].quantity} ${matchingPantryItems[0].unit}`
+					: `0 ${ingredient.amount.metric.unit}`;
+			}
 
 			return (
 				<View style={styles.ingredientRow} key={index}>
@@ -237,10 +245,10 @@ const RecipeDetails = ({ route }) => {
 						color={ingredientAvailability[index] ? COLORS.primary : COLORS.lightGray}
 						style={styles.ingredientIcon}
 					/>
-					<Text style={[styles.text, ingredientAvailability[index] ? styles.strikethroughText : null]}>
+					<Text style={styles.text}>
 						<Text style={styles.boldText}>{ingredient.amount.metric.value}</Text>{" "}
 						<Text style={styles.boldText}>{ingredient.amount.metric.unit}</Text> {ingredient.name}{" "}
-						<Text style={{ color: "gray" }}>({totalPantryQuantity}g)</Text>
+						<Text style={{ color: "gray" }}>({pantryQuantityDisplay})</Text>
 					</Text>
 				</View>
 			);
