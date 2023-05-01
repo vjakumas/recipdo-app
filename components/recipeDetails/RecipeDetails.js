@@ -135,6 +135,7 @@ const RecipeDetails = ({ route }) => {
 		let totalPantryItemQuantity = 0;
 		for (const item of matchingPantryItems) {
 			const convertedAmount = await convertIngredientAmount(ingredient.name, ingredient.amount.metric.unit, item.unit, item.quantity);
+			console.log(ingredient.name, ingredient.amount.metric.unit, item.unit, item.quantity);
 			totalPantryItemQuantity += convertedAmount || 0;
 		}
 
@@ -227,16 +228,10 @@ const RecipeDetails = ({ route }) => {
 		return ingredients.map((ingredient, index) => {
 			const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
 
-			let pantryQuantityDisplay;
-
-			if (ingredient.amount.metric.unit === "" && matchingPantryItems[0] === undefined) {
-				pantryQuantityDisplay = "0 units";
-			} else {
-				pantryQuantityDisplay = matchingPantryItems.length
-					? `${matchingPantryItems[0].quantity} ${matchingPantryItems[0].unit}`
-					: `0 ${ingredient.amount.metric.unit}`;
-			}
-
+			const ingredientUnit = ingredient.amount.metric.unit || "unit";
+			const pantryQuantityDisplay = matchingPantryItems.length
+				? `${matchingPantryItems[0].quantity}${matchingPantryItems[0].unit}`
+				: `0 ${ingredientUnit}`;
 			return (
 				<View style={styles.ingredientRow} key={index}>
 					<FontAwesome
@@ -246,9 +241,8 @@ const RecipeDetails = ({ route }) => {
 						style={styles.ingredientIcon}
 					/>
 					<Text style={styles.text}>
-						<Text style={styles.boldText}>{ingredient.amount.metric.value}</Text>{" "}
-						<Text style={styles.boldText}>{ingredient.amount.metric.unit}</Text> {ingredient.name}{" "}
-						<Text style={{ color: "gray" }}>({pantryQuantityDisplay})</Text>
+						<Text style={styles.boldText}>{ingredient.amount.metric.value}</Text> <Text style={styles.boldText}>{ingredientUnit}</Text>{" "}
+						{ingredient.name} <Text style={{ color: "gray" }}>({pantryQuantityDisplay})</Text>
 					</Text>
 				</View>
 			);
