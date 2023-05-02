@@ -145,9 +145,13 @@ const RecipeDetails = ({ route }) => {
 		// If the ingredient's unit is not a common measurement, try to convert it to grams
 		if (!isCommonMeasurement(ingredientUnit)) {
 			try {
-				const convertedIngredient = await convertIngredientAmount(ingredient.name, ingredientUnit, "g", ingredient.amount.metric.value);
+				const convertedIngredient = await convertIngredientAmount(
+					ingredient.name,
+					ingredientUnit,
+					ingredient.amount.metric.unit,
+					ingredient.amount.metric.value
+				);
 				if (convertedIngredient) {
-					ingredient.amount.metric.unit = "g";
 					ingredient.amount.metric.value = convertedIngredient;
 				} else {
 					ingredient.amount.metric.unit = "unit";
@@ -271,10 +275,13 @@ const RecipeDetails = ({ route }) => {
 		return ingredients.map((ingredient, index) => {
 			const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
 
+			let totalPantryItemSum = 0;
+			for (const item of matchingPantryItems) {
+				console.log(item.quantity);
+				totalPantryItemSum += parseFloat(item.quantity);
+			}
 			const ingredientUnit = ingredient.amount.metric.unit || "unit";
-			const pantryQuantityDisplay = matchingPantryItems.length
-				? `${matchingPantryItems[0].quantity}${matchingPantryItems[0].unit}`
-				: `0 ${ingredientUnit}`;
+			const pantryQuantityDisplay = matchingPantryItems.length ? `${totalPantryItemSum} ${matchingPantryItems[0].unit}` : `0 ${ingredientUnit}`;
 			return (
 				<View style={styles.ingredientRow} key={index}>
 					<FontAwesome
@@ -337,9 +344,9 @@ const RecipeDetails = ({ route }) => {
 					}
 				}
 
-				await userRef.update({
-					pantryItems: pantryItems,
-				});
+				// await userRef.update({
+				// 	pantryItems: pantryItems,
+				// });
 			}
 		}
 	};
@@ -387,6 +394,7 @@ const RecipeDetails = ({ route }) => {
 					<View style={styles.container}>
 						<View style={styles.header}>
 							<Text style={styles.title}>{title}</Text>
+							<Text style={styles.title}>{recipe.id}</Text>
 							<TouchableOpacity style={styles.saveRecipeButton} onPress={toggleSaveRecipe}>
 								{isSaved ? (
 									<MaterialIcons name="favorite" size={24} color="red" />
