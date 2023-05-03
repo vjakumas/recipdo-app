@@ -11,7 +11,7 @@ const COLORS = {
 	white: "#F3F4F8",
 	lightWhite: "#FAFAFC",
 
-	warning: "#FFC542",
+	warning: "#C88B30",
 	error: "#FF5C5C",
 };
 

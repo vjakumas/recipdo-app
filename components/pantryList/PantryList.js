@@ -8,6 +8,7 @@ import ProductCardLarge from "../../components/common/cards/productCardLarge/Pro
 import ProductCardLargeList from "../../components/common/cards/productCardLarge/ProductCardLargeList";
 import firebase from "../../config/firebase/config";
 import { ScrollView } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/native";
 
 const PantryList = () => {
 	const [searchText, setSearchText] = useState("");
@@ -15,6 +16,7 @@ const PantryList = () => {
 	const [remainingProducts, setRemainingProducts] = useState([]);
 	const [expiringSoonProducts, setExpiringSoonProducts] = useState([]);
 	const [filteredProducts, setFilteredProducts] = useState([]);
+	const navigation = useNavigation();
 
 	useEffect(() => {
 		const user = firebase.auth().currentUser;
@@ -51,6 +53,10 @@ const PantryList = () => {
 			handleSearch();
 		}
 	}, [searchText]);
+
+	const onProductPress = (product) => {
+		navigation.navigate("PantryDetails", product);
+	};
 
 	const handleSearch = async () => {
 		const searchResults = allProducts.filter((product) => product.name.toLowerCase().includes(searchText.toLowerCase()));
@@ -91,13 +97,13 @@ const PantryList = () => {
 					{displayExpiringSoonProducts.length > 0 ? (
 						<>
 							<Text style={styles.sectionTitle}>Expiring Soon</Text>
-							<ProductCardMediumList products={displayExpiringSoonProducts} />
+							<ProductCardMediumList products={displayExpiringSoonProducts} onPress={onProductPress} />
 						</>
 					) : null}
 					{displayRemainingProducts.length > 0 ? (
 						<>
 							<Text style={styles.sectionTitle}>Remaining Products</Text>
-							<ProductCardLargeList products={displayRemainingProducts} />
+							<ProductCardLargeList products={displayRemainingProducts} onPress={onProductPress} />
 						</>
 					) : null}
 				</ScrollView>

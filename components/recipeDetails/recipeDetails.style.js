@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
 import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const styles = StyleSheet.create({
 	safeArea: {
@@ -212,16 +211,15 @@ const styles = StyleSheet.create({
 	modalOverlay: {
 		flex: 1,
 		backgroundColor: "rgba(0, 0, 0, 0.5)",
-		justifyContent: "center", // Add this line
-		alignItems: "center", // Add this line
+		justifyContent: "center",
+		alignItems: "center",
 	},
 	modalContainer: {
 		backgroundColor: "white",
 		borderRadius: 10,
 		padding: 20,
-		width: "80%", // Add this line
+		width: "80%",
 	},
-
 	modalTitle: {
 		fontSize: 20,
 		fontWeight: "bold",

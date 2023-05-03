@@ -4,6 +4,7 @@ import Home from "../components/home/Home";
 import SettingsScreen from "../components/settings/Settings";
 import StatisticsScreen from "../components/statistics/Statistic";
 import RecipeDetails from "../components/recipeDetails/RecipeDetails";
+import PantryDetails from "../components/pantryDetails/PantryDetails";
 
 const MainStack = createStackNavigator();
 
@@ -17,6 +18,7 @@ const MainStackNavigator = () => {
 			<MainStack.Screen name="Settings" component={SettingsScreen} />
 			<MainStack.Screen name="Statistics" component={StatisticsScreen} />
 			<MainStack.Screen name="RecipeDetails" component={RecipeDetails} />
+			<MainStack.Screen name="PantryDetails" component={PantryDetails} />
 		</MainStack.Navigator>
 	);
 };

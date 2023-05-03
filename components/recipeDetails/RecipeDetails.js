@@ -451,7 +451,7 @@ const RecipeDetails = ({ route, navigation }) => {
 					<View>
 						<Image style={styles.image} source={{ uri: image }} />
 						<View style={styles.dishTypeContainer}>
-							<Text style={styles.dishType}>{dishType}</Text>
+							<Text style={styles.dishType}>{dishType ? dishType.charAt(0).toUpperCase() + dishType.slice(1) : ""}</Text>
 						</View>
 						<View style={styles.readyInMinutesContainer}>
 							<Text style={styles.readyInMinutes}>
@@ -462,7 +462,6 @@ const RecipeDetails = ({ route, navigation }) => {
 					<View style={styles.container}>
 						<View style={styles.header}>
 							<Text style={styles.title}>{title}</Text>
-							<Text style={styles.title}>{recipe.id}</Text>
 							<TouchableOpacity style={styles.saveRecipeButton} onPress={toggleSaveRecipe}>
 								{isSaved ? (
 									<MaterialIcons name="favorite" size={24} color="red" />
