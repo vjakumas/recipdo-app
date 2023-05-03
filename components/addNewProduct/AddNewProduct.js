@@ -188,7 +188,7 @@ const AddNewProduct = () => {
 				pantryId: Date.now().toString(),
 				productImageURL,
 				name,
-				quantity,
+				quantity: quantity.replace(",", "."),
 				date,
 				unit,
 				addedDate,

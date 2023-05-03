@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator } from "react-native";
+import { SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, View, Text, Image, Modal, TouchableWithoutFeedback } from "react-native";
+
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
 import styles from "./recipeDetails.style";
@@ -20,10 +21,12 @@ const RecipeDetails = ({ route }) => {
 	const [isSaved, setIsSaved] = useState(false);
 	const [ingredientAvailability, setIngredientAvailability] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [selectedSteps, setSelectedSteps] = useState([]);
+	const [modalVisible, setModalVisible] = useState(false);
 
 	useEffect(() => {
 		const fetchData = async () => {
-			await fetchPantryList();
+			await fetchPantryItems();
 			await fetchIngredients();
 			await checkIfRecipeIsSaved();
 			await fetchNutritionData();
@@ -31,6 +34,7 @@ const RecipeDetails = ({ route }) => {
 		};
 		setIsLoading(true);
 		fetchData();
+		setSelectedSteps([]);
 		setIngredientAvailability([]);
 	}, [recipe]);
 
@@ -81,12 +85,12 @@ const RecipeDetails = ({ route }) => {
 		setIsSaved(!isSaved);
 	};
 
-	const fetchPantryList = async () => {
+	const fetchPantryItems = async () => {
 		const userId = firebase.auth().currentUser.uid;
 		const userDocRef = firebase.firestore().collection("users").doc(userId);
 		const userDoc = await userDocRef.get();
-		const userPantryList = userDoc.data().pantryItems || [];
-		setPantryItems(userPantryList);
+		const userPantryItems = userDoc.data().pantryItems || [];
+		setPantryItems(userPantryItems);
 	};
 
 	const fetchIngredients = async () => {
@@ -124,6 +128,14 @@ const RecipeDetails = ({ route }) => {
 		} catch (error) {
 			console.error(error);
 		}
+	};
+
+	const showModal = () => {
+		setModalVisible(true);
+	};
+
+	const hideModal = () => {
+		setModalVisible(false);
 	};
 
 	// Helper function to check if a unit is a common measurement
@@ -175,14 +187,15 @@ const RecipeDetails = ({ route }) => {
 				continue;
 			}
 			const convertedAmount = await convertIngredientAmount(ingredient.name, ingredientUnit, item.unit, item.quantity);
-			console.log(ingredient.name, ingredientUnit, item.unit, item.quantity);
 			totalPantryItemQuantity += convertedAmount || 0;
 		}
 
 		if (!isCommonMeasurement(ingredient.amount.metric.unit) && ingredient.amount.metric.unit === "unit") {
+			totalPantryItemQuantity = 0;
 			for (const item of matchingPantryItems) {
 				totalPantryItemQuantity += parseInt(item.quantity);
 			}
+			console.log("DUXAS " + ingredient.name + " " + parseInt(totalPantryItemQuantity) + " " + parseInt(ingredient.amount.metric.value));
 			return totalPantryItemQuantity >= parseInt(ingredient.amount.metric.value);
 		}
 
@@ -262,6 +275,7 @@ const RecipeDetails = ({ route }) => {
 			});
 			await subtractIngredients();
 			alert("Recipe marked as finished and ingredients subtracted!");
+			hideModal();
 		} catch (error) {
 			console.error("Error marking recipe as finished:", error);
 		}
@@ -307,47 +321,75 @@ const RecipeDetails = ({ route }) => {
 			const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
 
 			if (matchingPantryItems.length > 0) {
-				matchingPantryItems.sort((a, b) => new Date(a.date) - new Date(b.date));
+				matchingPantryItems.sort((a, b) => a.date - b.date);
 				let remainingAmount = ingredient.amount.metric.value;
 				console.log("REMAINING: " + remainingAmount);
 				for (const pantryItem of matchingPantryItems) {
-					const convertedAmount = await convertIngredientAmount(
-						ingredient.name,
-						ingredient.amount.metric.unit,
-						pantryItem.unit,
-						pantryItem.quantity
-					);
-					if (convertedAmount >= remainingAmount) {
-						const convertedAmountToOriginal = await convertIngredientAmount(
+					if (isCommonMeasurement(ingredient.amount.metric.unit)) {
+						const convertedAmount = await convertIngredientAmount(
 							ingredient.name,
-							pantryItem.unit,
 							ingredient.amount.metric.unit,
-							convertedAmount - remainingAmount
+							pantryItem.unit,
+							pantryItem.quantity
 						);
-						pantryItem.quantity = convertedAmountToOriginal;
-						remainingAmount = 0;
-					} else {
-						remainingAmount -= pantryItem.quantity;
-						pantryItem.quantity = 0;
-						remainingAmount -= convertedAmount;
+						if (convertedAmount >= remainingAmount) {
+							const convertedAmountToOriginal = await convertIngredientAmount(
+								ingredient.name,
+								pantryItem.unit,
+								ingredient.amount.metric.unit,
+								convertedAmount - remainingAmount
+							);
+							pantryItem.quantity = convertedAmountToOriginal;
+							remainingAmount = 0;
+						} else {
+							remainingAmount -= convertedAmount;
+							pantryItem.quantity = 0;
 
-						// Find the index of the pantryItem in the pantryItems array
-						const index = pantryItems.indexOf(pantryItem);
-						if (index !== -1) {
-							// Remove the pantryItem from the pantryItems array
-							pantryItems.splice(index, 1);
+							// Find the index of the pantryItem in the pantryItems array
+							const index = pantryItems.indexOf(pantryItem);
+							if (index !== -1) {
+								// Remove the pantryItem from the pantryItems array
+								pantryItems.splice(index, 1);
+							}
 						}
-					}
 
-					if (remainingAmount <= 0) {
-						break;
+						if (remainingAmount <= 0) {
+							break;
+						}
+					} else {
+						if (pantryItem.quantity > remainingAmount) {
+							pantryItem.quantity -= remainingAmount;
+							remainingAmount = 0;
+						} else {
+							remainingAmount -= pantryItem.quantity;
+							pantryItem.quantity = 0;
+
+							// Find the index of the pantryItem in the pantryItems array
+							const index = pantryItems.indexOf(pantryItem);
+							if (index !== -1) {
+								// Remove the pantryItem from the pantryItems array
+								pantryItems.splice(index, 1);
+							}
+						}
+
+						if (remainingAmount <= 0) {
+							break;
+						}
 					}
 				}
 
-				// await userRef.update({
-				// 	pantryItems: pantryItems,
-				// });
+				await userRef.update({
+					pantryItems: pantryItems,
+				});
 			}
+		}
+	};
+
+	const onInstructionStepClick = (index) => {
+		if (selectedSteps.includes(index)) {
+			setSelectedSteps(selectedSteps.filter((stepIndex) => stepIndex !== index));
+		} else {
+			setSelectedSteps([...selectedSteps, index]);
 		}
 	};
 
@@ -360,20 +402,48 @@ const RecipeDetails = ({ route }) => {
 
 		return (
 			<View style={styles.instructionsContainer}>
-				{steps.map((step, index) => (
-					<View key={index} style={styles.instructionStep}>
-						<View style={styles.instructionBulletContainer}>
-							<Text style={styles.instructionBullet}>{index + 1}</Text>
-						</View>
-						<Text style={styles.instructionText}>{step.trim()}</Text>
-					</View>
-				))}
+				{steps.map((step, index) => {
+					const isSelected = selectedSteps.includes(index);
+					return (
+						<TouchableOpacity
+							key={index}
+							style={[styles.instructionStep, isSelected ? styles.instructionStepSelected : {}]}
+							onPress={() => onInstructionStepClick(index)}>
+							<View style={[styles.instructionBulletContainer, isSelected ? styles.instructionBulletContainerSelected : {}]}>
+								{isSelected ? (
+									<FontAwesome name="chevron-circle-down" style={styles.instructionCheck} />
+								) : (
+									<Text style={styles.instructionBullet}>{index + 1}</Text>
+								)}
+							</View>
+							<Text style={[styles.instructionText, isSelected ? styles.instructionTextSelected : {}]}>{step.trim()}</Text>
+						</TouchableOpacity>
+					);
+				})}
 			</View>
 		);
 	};
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
+			<Modal animationType="slide" transparent={true} visible={modalVisible}>
+				<TouchableWithoutFeedback onPress={hideModal}>
+					<View style={styles.modalOverlay}>
+						<View style={styles.modalContainer}>
+							<Text style={styles.modalTitle}>Finish Recipe</Text>
+							<Text style={styles.modalText}>Are you sure you want to finish this recipe and subtract the ingredients?</Text>
+							<View style={styles.modalButtonsContainer}>
+								<TouchableOpacity style={styles.modalCancelButton} onPress={hideModal}>
+									<Text style={styles.modalCancelButtonText}>Cancel</Text>
+								</TouchableOpacity>
+								<TouchableOpacity style={styles.modalConfirmButton} onPress={() => finishRecipe(recipe.id)}>
+									<Text style={styles.modalConfirmButtonText}>Confirm</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					</View>
+				</TouchableWithoutFeedback>
+			</Modal>
 			{isLoading ? (
 				<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
 					<ActivityIndicator size="large" color={COLORS.primary} />
@@ -442,7 +512,7 @@ const RecipeDetails = ({ route }) => {
 						</View>
 						<Text style={styles.instructionsTitle}>Instructions</Text>
 						{renderInstructions()}
-						<TouchableOpacity style={styles.submitButton} onPress={() => finishRecipe(recipe.id)}>
+						<TouchableOpacity style={styles.submitButton} onPress={showModal}>
 							<Text style={styles.submitButtonText}>Finish recipe</Text>
 						</TouchableOpacity>
 					</View>

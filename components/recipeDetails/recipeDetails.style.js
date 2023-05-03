@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const styles = StyleSheet.create({
 	safeArea: {
@@ -139,11 +140,25 @@ const styles = StyleSheet.create({
 	},
 	instructionStep: {
 		flexDirection: "row",
+		borderColor: COLORS.lightGray,
+		borderWidth: 1,
+		borderRadius: 5,
 		marginBottom: 8,
 	},
 	instructionBulletContainer: {
-		backgroundColor: COLORS.secondary,
-		borderRadius: 50,
+		backgroundColor: COLORS.lightGray,
+		borderTopLeftRadius: 4,
+		borderBottomLeftRadius: 4,
+		paddingHorizontal: 15,
+		paddingVertical: 10,
+		justifyContent: "center",
+		alignItems: "center",
+		marginRight: 8,
+	},
+	instructionBulletContainerSelected: {
+		backgroundColor: COLORS.primary,
+		borderTopLeftRadius: 4,
+		borderBottomLeftRadius: 4,
 		paddingHorizontal: 15,
 		paddingVertical: 10,
 		justifyContent: "center",
@@ -153,14 +168,31 @@ const styles = StyleSheet.create({
 	instructionBullet: {
 		fontSize: 16,
 		fontWeight: "bold",
-		color: COLORS.primary,
+		color: COLORS.darkGray,
 	},
 	instructionText: {
 		fontSize: 16,
 		fontFamily: FONT.regular,
 		flex: 1,
 		flexWrap: "wrap",
+		alignSelf: "center",
+		textAlignVertical: "center",
+	},
+	instructionStepSelected: {
+		backgroundColor: COLORS.primary,
+	},
+	instructionTextSelected: {
+		fontSize: 16,
+		fontFamily: FONT.regular,
+		flex: 1,
+		flexWrap: "wrap",
 		alignContent: "flex-end",
+		color: "white",
+		textDecorationLine: "line-through",
+	},
+	instructionCheck: {
+		fontSize: 25,
+		color: "white",
 	},
 	submitButton: {
 		width: "100%",
@@ -176,6 +208,50 @@ const styles = StyleSheet.create({
 		fontFamily: FONT.bold,
 		fontSize: SIZES.medium,
 		color: COLORS.white,
+	},
+	modalOverlay: {
+		flex: 1,
+		backgroundColor: "rgba(0, 0, 0, 0.5)",
+		justifyContent: "center", // Add this line
+		alignItems: "center", // Add this line
+	},
+	modalContainer: {
+		backgroundColor: "white",
+		borderRadius: 10,
+		padding: 20,
+		width: "80%", // Add this line
+	},
+
+	modalTitle: {
+		fontSize: 20,
+		fontWeight: "bold",
+		marginBottom: 10,
+	},
+	modalText: {
+		fontSize: 16,
+		marginBottom: 20,
+	},
+	modalButtonsContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+	},
+	modalCancelButton: {
+		backgroundColor: "gray",
+		padding: 10,
+		borderRadius: 5,
+	},
+	modalConfirmButton: {
+		backgroundColor: COLORS.primary,
+		padding: 10,
+		borderRadius: 5,
+	},
+	modalCancelButtonText: {
+		color: "white",
+		fontWeight: "bold",
+	},
+	modalConfirmButtonText: {
+		color: "white",
+		fontWeight: "bold",
 	},
 });
 
