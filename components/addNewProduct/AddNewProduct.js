@@ -184,6 +184,10 @@ const AddNewProduct = () => {
 			const userDoc = await userDocRef.get();
 			const existingPantryItems = userDoc.data().pantryItems || [];
 
+			const today = new Date();
+			const fiveDaysLater = new Date(today);
+			fiveDaysLater.setDate(today.getDate() + 5);
+
 			const newPantryItem = {
 				pantryId: Date.now().toString(),
 				productImageURL,
@@ -197,7 +201,7 @@ const AddNewProduct = () => {
 				fats,
 				protein,
 				isExpired: false,
-				isExpiringSoon: false,
+				isExpiringSoon: date > today && date <= fiveDaysLater,
 			};
 
 			const updatedPantryItems = [...existingPantryItems, newPantryItem];

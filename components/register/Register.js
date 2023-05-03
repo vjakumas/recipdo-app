@@ -33,7 +33,11 @@ const Register = () => {
 						alert(error.message);
 					})
 					.then(() => {
+						const today = new Date();
+						const yesterday = new Date(today);
+						yesterday.setDate(today.getDate() - 1);
 						firebase.firestore().collection("users").doc(firebase.auth().currentUser.uid).set({
+							productsLastCheckDate: yesterday,
 							name,
 							email,
 							consumedProducts: 0,

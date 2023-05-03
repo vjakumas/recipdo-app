@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 
 import AuthNavigator from "./AuthNavigator";
 import MainAppNavigator from "./MainAppNavigator";
+import Toast from "react-native-toast-message";
 
 const Stack = createStackNavigator();
 
@@ -18,6 +19,7 @@ const AppNavigator = ({ user, onLogout }) => {
 				<Stack.Screen name="Auth" component={AuthNavigator} />
 				<Stack.Screen name="MainApp">{(props) => <MainAppNavigator {...props} onLogout={onLogout} />}</Stack.Screen>
 			</Stack.Navigator>
+			<Toast ref={(ref) => Toast.setRef(ref)} />
 		</NavigationContainer>
 	);
 };

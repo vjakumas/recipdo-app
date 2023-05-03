@@ -24,6 +24,7 @@ const Home = ({ navigation }) => {
 					console.log("User does not exist");
 				}
 			});
+		updateExpiringItems();
 	}, []);
 
 	const profileDropdownRef = useRef(null);
@@ -31,6 +32,42 @@ const Home = ({ navigation }) => {
 	const toggleDropdown = () => {
 		if (profileDropdownRef.current) {
 			profileDropdownRef.current.toggleDropdown();
+		}
+	};
+
+	const isDateInPast = (date1, date2) => {
+		const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
+		const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
+		return d1 < d2;
+	};
+
+	const updateExpiringItems = async () => {
+		const userId = firebase.auth().currentUser.uid;
+		const userRef = firebase.firestore().collection("users").doc(userId);
+
+		const userData = await userRef.get();
+		const productsLastCheckDate = userData.data().productsLastCheckDate.toDate();
+		const today = new Date();
+		const fiveDaysLater = new Date(today);
+		fiveDaysLater.setDate(today.getDate() + 5);
+
+		if (isDateInPast(productsLastCheckDate, today)) {
+			const pantryItems = userData.data().pantryItems;
+			console.log("Pantry items:", pantryItems);
+
+			const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
+			const fiveDaysLaterTimestamp = firebase.firestore.Timestamp.fromDate(fiveDaysLater);
+
+			const updatedPantryItems = pantryItems.map((item) => {
+				const itemDate = item.date.toDate();
+				if (itemDate > today && todayTimestamp <= fiveDaysLaterTimestamp && !item.isExpiringSoon) {
+					return { ...item, isExpiringSoon: true };
+				}
+				return item;
+			});
+
+			await userRef.update({ pantryItems: updatedPantryItems });
+			await userRef.update({ productsLastCheckDate: firebase.firestore.Timestamp.fromDate(new Date()) });
 		}
 	};
 

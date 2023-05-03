@@ -5,6 +5,7 @@ import { useFonts } from "expo-font";
 import { COLORS, icons, images, SIZES } from "./constants";
 import React, { useState, useEffect } from "react";
 import firebase from "./config/firebase/config";
+import Toast from "react-native-toast-message";
 
 import AppNavigator from "./navigation/AppNavigator";
 

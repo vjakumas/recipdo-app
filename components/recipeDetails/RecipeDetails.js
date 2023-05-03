@@ -3,12 +3,13 @@ import { SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, View, Te
 
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
+import Toast from "react-native-toast-message";
 import styles from "./recipeDetails.style";
 import firebase, { firestore } from "../../config/firebase/config";
 import axios from "axios";
 import Constants from "expo-constants";
 
-const RecipeDetails = ({ route }) => {
+const RecipeDetails = ({ route, navigation }) => {
 	const { recipe } = route.params;
 	const title = recipe.title;
 	const image = recipe.image;
@@ -274,7 +275,19 @@ const RecipeDetails = ({ route }) => {
 				finishedRecipes: firebase.firestore.FieldValue.arrayUnion(recipeId),
 			});
 			await subtractIngredients();
-			alert("Recipe marked as finished and ingredients subtracted!");
+
+			Toast.show({
+				type: "success",
+				text1: "Recipe marked as finished!",
+				text2: "Ingredients have been subtracted.",
+				visibilityTime: 3000,
+				autoHide: true,
+				topOffset: 60,
+				bottomOffset: 40,
+			});
+
+			navigation.navigate("Home");
+
 			hideModal();
 		} catch (error) {
 			console.error("Error marking recipe as finished:", error);

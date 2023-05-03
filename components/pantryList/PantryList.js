@@ -24,7 +24,13 @@ const PantryList = () => {
 				.doc(user.uid)
 				.onSnapshot((doc) => {
 					const pantryItems = doc.data().pantryItems;
-					const expiringSoon = pantryItems.filter((product) => product.isExpiringSoon);
+					const expiringSoon = pantryItems
+						.filter((product) => product.isExpiringSoon)
+						.sort((a, b) => {
+							const aDate = a.date?.toDate() || new Date();
+							const bDate = b.date?.toDate() || new Date();
+							return aDate - bDate;
+						});
 					const remaining = pantryItems.filter((product) => !product.isExpiringSoon);
 					setExpiringSoonProducts(expiringSoon);
 					setRemainingProducts(remaining);
