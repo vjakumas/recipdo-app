@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, View, Text, Image, Modal, TouchableWithoutFeedback } from "react-native";
 
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -249,21 +249,6 @@ const RecipeDetails = ({ route, navigation }) => {
 			console.error(error);
 			return null;
 		}
-	};
-
-	const getTotalPantryQuantity = (ingredientName) => {
-		const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredientName.toLowerCase().trim());
-
-		if (matchingPantryItems.length === 0) {
-			return 0;
-		}
-
-		let totalPantryItemQuantity = 0;
-		for (const item of matchingPantryItems) {
-			totalPantryItemQuantity += item.quantity;
-		}
-
-		return totalPantryItemQuantity;
 	};
 
 	const finishRecipe = async (recipeId) => {

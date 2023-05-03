@@ -23,7 +23,6 @@ const SavedRecipes = () => {
 			const userId = firebase.auth().currentUser.uid;
 			const userDoc = await firestore.collection("users").doc(userId).get();
 			const savedRecipeIds = userDoc.data().savedRecipes.join(",");
-			console.log(userDoc.data().savedRecipes);
 			const options = {
 				method: "GET",
 				url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk",
@@ -106,26 +105,35 @@ const SavedRecipes = () => {
 				<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} />
 			</View>
 			<View style={{ flex: 1 }}>
-				<View
-					style={{
-						flexDirection: "row",
-						justifyContent: "space-between",
-						alignItems: "center",
-						paddingHorizontal: SIZES.medium,
-						marginTop: SIZES.medium,
-						marginBottom: SIZES.small,
-					}}>
-					<Text style={styles.titleText}>Saved Recipes</Text>
-					<Text style={styles.totalText}>{recipes.length} Results</Text>
-				</View>
-				<FlatList
-					data={recipes}
-					renderItem={({ item }) => <RecipeCard recipe={item} onPress={() => onRecipePress(item)} />}
-					keyExtractor={(item) => item.id.toString()}
-					showsVerticalScrollIndicator={false}
-					contentContainerStyle={{ paddingBottom: SIZES.medium }}
-					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
-				/>
+				{recipes.length > 0 && (
+					<View
+						style={{
+							flexDirection: "row",
+							justifyContent: "space-between",
+							alignItems: "center",
+							paddingHorizontal: SIZES.medium,
+							marginTop: SIZES.medium,
+							marginBottom: SIZES.small,
+						}}>
+						<Text style={styles.titleText}>Saved Recipes</Text>
+						<Text style={styles.totalText}>{recipes.length} Results</Text>
+					</View>
+				)}
+				{recipes.length > 0 ? (
+					<FlatList
+						data={recipes}
+						renderItem={({ item }) => <RecipeCard recipe={item} onPress={() => onRecipePress(item)} />}
+						keyExtractor={(item) => item.id.toString()}
+						showsVerticalScrollIndicator={false}
+						contentContainerStyle={{ paddingBottom: SIZES.medium }}
+						refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+					/>
+				) : (
+					<View style={styles.noProductsContainer}>
+						<Text style={styles.noProductsHeader}>Your Recipe Collection is Empty!</Text>
+						<Text style={styles.noProductsTitle}>Save recipes for easy access later!</Text>
+					</View>
+				)}
 			</View>
 		</SafeAreaView>
 	);

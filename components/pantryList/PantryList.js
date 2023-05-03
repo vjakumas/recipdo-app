@@ -14,6 +14,7 @@ const PantryList = () => {
 	const [allProducts, setAllProducts] = useState([]);
 	const [remainingProducts, setRemainingProducts] = useState([]);
 	const [expiringSoonProducts, setExpiringSoonProducts] = useState([]);
+	const [filteredProducts, setFilteredProducts] = useState([]);
 
 	useEffect(() => {
 		const user = firebase.auth().currentUser;
@@ -43,34 +44,64 @@ const PantryList = () => {
 		}
 	}, []);
 
+	useEffect(() => {
+		if (searchText === "") {
+			setFilteredProducts([]);
+		} else {
+			handleSearch();
+		}
+	}, [searchText]);
+
 	const handleSearch = async () => {
-		console.log("search!");
+		const searchResults = allProducts.filter((product) => product.name.toLowerCase().includes(searchText.toLowerCase()));
+		setFilteredProducts(searchResults);
 	};
+
+	const displayExpiringSoonProducts =
+		filteredProducts.length > 0 ? filteredProducts.filter((product) => product.isExpiringSoon) : expiringSoonProducts;
+	const displayRemainingProducts = filteredProducts.length > 0 ? filteredProducts.filter((product) => !product.isExpiringSoon) : remainingProducts;
 
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.logoContainer}>
 				<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} resizeMode="contain" />
 			</View>
-			<View style={styles.searchContainer}>
-				<View style={styles.searchIconContainer}>
-					<Ionicons name="search" size={20} color={COLORS.gray} />
+			{(expiringSoonProducts.length > 0 || remainingProducts.length > 0) && (
+				<View style={styles.searchContainer}>
+					<View style={styles.searchIconContainer}>
+						<Ionicons name="search" size={20} color={COLORS.gray} />
+					</View>
+					<TextInput
+						style={styles.searchInput}
+						value={searchText}
+						onChangeText={(text) => setSearchText(text)}
+						placeholder="Search..."
+						returnKeyType="search"
+						onSubmitEditing={handleSearch}
+					/>
 				</View>
-				<TextInput
-					style={styles.searchInput}
-					value={searchText}
-					onChangeText={(text) => setSearchText(text)}
-					placeholder="Search..."
-					returnKeyType="search"
-					onSubmitEditing={handleSearch}
-				/>
-			</View>
-			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.productList}>
-				<Text style={styles.sectionTitle}>Expiring Soon</Text>
-				<ProductCardMediumList products={expiringSoonProducts} />
-				<Text style={styles.sectionTitle}>Remaining Products</Text>
-				<ProductCardLargeList products={remainingProducts} />
-			</ScrollView>
+			)}
+			{expiringSoonProducts.length === 0 && remainingProducts.length === 0 ? (
+				<View style={styles.noProductsContainer}>
+					<Text style={styles.noProductsHeader}>Your pantry is waiting to be filled!</Text>
+					<Text style={styles.noProductsTitle}>The possibilities are endless with a full pantry.</Text>
+				</View>
+			) : (
+				<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.productList}>
+					{displayExpiringSoonProducts.length > 0 ? (
+						<>
+							<Text style={styles.sectionTitle}>Expiring Soon</Text>
+							<ProductCardMediumList products={displayExpiringSoonProducts} />
+						</>
+					) : null}
+					{displayRemainingProducts.length > 0 ? (
+						<>
+							<Text style={styles.sectionTitle}>Remaining Products</Text>
+							<ProductCardLargeList products={displayRemainingProducts} />
+						</>
+					) : null}
+				</ScrollView>
+			)}
 		</SafeAreaView>
 	);
 };

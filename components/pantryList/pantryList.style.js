@@ -22,6 +22,26 @@ const styles = StyleSheet.create({
 		marginTop: 20,
 		marginBottom: 10,
 	},
+	productList: {
+		flexGrow: 1,
+	},
+	noProductsContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	noProductsTitle: {
+		fontFamily: FONT.regular,
+		fontSize: SIZES.medium,
+		color: COLORS.gray,
+		textAlign: "center",
+		marginTop: SIZES.small,
+	},
+	noProductsHeader: {
+		fontFamily: FONT.bold,
+		fontSize: SIZES.large,
+		color: COLORS.gray,
+	},
 	searchContainer: {
 		flexDirection: "row",
 		alignItems: "center",

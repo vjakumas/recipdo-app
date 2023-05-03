@@ -6,6 +6,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+		backgroundColor: COLORS.white,
 	},
 	logoContainer: {
 		alignItems: "center",
@@ -102,6 +103,33 @@ const styles = StyleSheet.create({
 	infoText: {
 		marginLeft: 5,
 		color: "white",
+	},
+	noRecipesContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	noRecipesTitle: {
+		fontSize: 18,
+		fontWeight: "bold",
+		color: COLORS.gray,
+	},
+	noProductsContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	noProductsHeader: {
+		fontFamily: FONT.bold,
+		fontSize: SIZES.large,
+		color: COLORS.gray,
+	},
+	noProductsTitle: {
+		fontFamily: FONT.regular,
+		fontSize: SIZES.medium,
+		color: COLORS.gray,
+		textAlign: "center",
+		marginTop: SIZES.small,
 	},
 });
 
