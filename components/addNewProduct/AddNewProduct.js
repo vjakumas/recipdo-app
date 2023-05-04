@@ -151,6 +151,54 @@ const AddNewProduct = () => {
 		}
 	};
 
+	const handleSuggestionPress = async (selectedSuggestion) => {
+		setSearchText(selectedSuggestion.name);
+		setShowSuggestions(false);
+
+		const ingredientIdResponse = await axios({
+			method: "GET",
+			url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/food/ingredients/search",
+			params: {
+				query: selectedSuggestion.name,
+				metaInformation: "false",
+				number: "1",
+			},
+			headers: {
+				"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+			},
+		});
+
+		const ingredientId = ingredientIdResponse.data.results[0].id;
+
+		const nutritionOptions = {
+			method: "GET",
+			url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/food/ingredients/${ingredientId}/information`,
+			params: {
+				amount: "100",
+				unit: "grams",
+			},
+			headers: {
+				"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+			},
+		};
+
+		const nutritionResponse = await axios(nutritionOptions);
+
+		// Extract nutritional values
+		const caloriesObj = nutritionResponse.data.nutrition.nutrients.find((nutrient) => nutrient.name === "Calories");
+		const carbsObj = nutritionResponse.data.nutrition.nutrients.find((nutrient) => nutrient.name === "Carbohydrates");
+		const fatsObj = nutritionResponse.data.nutrition.nutrients.find((nutrient) => nutrient.name === "Fat");
+		const proteinObj = nutritionResponse.data.nutrition.nutrients.find((nutrient) => nutrient.name === "Protein");
+
+		// Update state variables
+		setCalories(caloriesObj ? caloriesObj.amount.toString() : "");
+		setCarbs(carbsObj ? carbsObj.amount.toString() : "");
+		setFats(fatsObj ? fatsObj.amount.toString() : "");
+		setProtein(proteinObj ? proteinObj.amount.toString() : "");
+	};
+
 	const checkRecipeExists = async (ingredient) => {
 		try {
 			const options = {
@@ -286,10 +334,7 @@ const AddNewProduct = () => {
 									<SuggestionItem
 										key={Math.random().toString()}
 										suggestion={suggestion}
-										onPress={(selectedSuggestion) => {
-											setSearchText(selectedSuggestion.name);
-											setShowSuggestions(false);
-										}}
+										onPress={() => handleSuggestionPress(suggestion)}
 									/>
 								))}
 							</View>
@@ -337,7 +382,7 @@ const AddNewProduct = () => {
 						</View>
 						<View style={styles.separatorContainer}>
 							<View style={styles.line} />
-							<Text style={styles.separatorText}>Nutrition (optional)</Text>
+							<Text style={styles.separatorText}>Nutrition (100g)</Text>
 							<View style={styles.line} />
 						</View>
 						<View style={styles.nutritionLabelRow}>
