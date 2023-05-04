@@ -60,14 +60,14 @@ const PantryDetails = ({ route }) => {
 				bottomOffset: 40,
 			});
 
-			navigation.navigate("Home");
+			navigation.navigate("PantryList");
 		} catch (error) {
 			console.error("Error removing product:", error);
 		}
 	};
 
 	const editProduct = () => {
-		// Implement logic to edit this product
+		navigation.navigate("EditProduct", {});
 	};
 
 	const textColor = () => {

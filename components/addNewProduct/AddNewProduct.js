@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { View, Alert, Text, TextInput, TouchableOpacity, SafeAreaView, Image, Keyboard, TouchableWithoutFeedback } from "react-native";
+import {
+	View,
+	Alert,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	SafeAreaView,
+	Image,
+	Keyboard,
+	TouchableWithoutFeedback,
+	ActivityIndicator,
+} from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import styles from "./addNewProduct.style";
 import firebase, { firestore } from "../../config/firebase/config";
+import Toast from "react-native-toast-message";
 import { COLORS } from "../../constants";
 import axios from "axios";
 
@@ -24,6 +36,7 @@ const AddNewProduct = () => {
 	const [showSuggestions, setShowSuggestions] = useState(false);
 	const [submitButtonColor, setSubmitButtonColor] = useState(COLORS.lightGray);
 	const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+	const [loading, setLoading] = useState(false);
 
 	const unitList = [
 		{ label: "Gram", value: "g" },
@@ -165,6 +178,7 @@ const AddNewProduct = () => {
 
 	const handleSubmit = async () => {
 		try {
+			setLoading(true);
 			if (!name || !quantity) {
 				alert("Please provide both name and quantity.");
 				return;
@@ -185,15 +199,22 @@ const AddNewProduct = () => {
 			const existingPantryItems = userDoc.data().pantryItems || [];
 
 			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+
+			const inputDate = new Date(date);
+			inputDate.setHours(0, 0, 0, 0);
+
 			const fiveDaysLater = new Date(today);
 			fiveDaysLater.setDate(today.getDate() + 5);
+
+			const dateTimestamp = firebase.firestore.Timestamp.fromDate(inputDate);
 
 			const newPantryItem = {
 				pantryId: Date.now().toString(),
 				productImageURL,
 				name,
 				quantity: quantity.replace(",", "."),
-				date,
+				date: dateTimestamp,
 				unit,
 				addedDate,
 				calories,
@@ -201,7 +222,7 @@ const AddNewProduct = () => {
 				fats,
 				protein,
 				isExpired: false,
-				isExpiringSoon: date > today && date <= fiveDaysLater,
+				isExpiringSoon: inputDate >= today && inputDate <= fiveDaysLater,
 			};
 
 			const updatedPantryItems = [...existingPantryItems, newPantryItem];
@@ -209,128 +230,170 @@ const AddNewProduct = () => {
 			await userDocRef.update({
 				pantryItems: updatedPantryItems,
 			});
-
+			setLoading(false);
 			console.log("Product added successfully");
-			Alert.alert("Success", "Product added successfully", [{ text: "OK", onPress: () => console.log("OK Pressed") }], { cancelable: false });
+			Toast.show({
+				type: "success",
+				text1: "Product created!",
+				text2: "The product has been sucessfully added to your pantry.",
+				visibilityTime: 4000,
+				autoHide: true,
+				topOffset: 60,
+				bottomOffset: 40,
+			});
 		} catch (error) {
 			console.error("Error adding product:", error);
+			setLoading(false);
 		}
 	};
 
 	return (
 		<TouchableWithoutFeedback onPress={dismissKeyboard}>
 			<SafeAreaView style={styles.container}>
-				<View style={styles.logoContainer}>
-					<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} />
-				</View>
-				<View style={styles.searchContainer}>
-					<View style={styles.searchIconContainer}>
-						<Ionicons name="search" size={20} color={COLORS.gray} />
+				{loading ? (
+					<View style={styles.spinnerContainer}>
+						<ActivityIndicator size="large" color={COLORS.primary} />
 					</View>
-					<TextInput
-						style={styles.searchInput}
-						value={name}
-						onChangeText={(text) => setSearchText(text)}
-						placeholder="Search..."
-						returnKeyType="search"
-						onSubmitEditing={handleSearch}
-						onFocus={() => handleSearch(true)}
-						onBlur={() => handleSearch(false)}
-					/>
-				</View>
-				{showSuggestions && (
-					<View style={styles.suggestionsContainer}>
-						{suggestions.map((suggestion) => (
-							<SuggestionItem
-								key={Math.random().toString()}
-								suggestion={suggestion}
-								onPress={(selectedSuggestion) => {
-									setSearchText(selectedSuggestion.name);
-									setShowSuggestions(false);
-								}}
+				) : (
+					<>
+						<View style={styles.logoContainer}>
+							<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} />
+						</View>
+						<Text style={styles.productNameLabel}>Product name</Text>
+						<View style={styles.searchContainer}>
+							<View style={styles.searchIconContainer}>
+								<Ionicons name="search" size={20} color={COLORS.gray} />
+							</View>
+							<TextInput
+								style={styles.searchInput}
+								value={name}
+								onChangeText={(text) => setSearchText(text)}
+								placeholder="Search..."
+								returnKeyType="search"
+								onSubmitEditing={handleSearch}
+								onFocus={() => handleSearch(true)}
+								onBlur={() => handleSearch(false)}
 							/>
-						))}
-					</View>
-				)}
-				<View style={styles.inputRow}>
-					<TextInput
-						style={styles.quantityInput}
-						value={quantity}
-						onChangeText={(text) => setQuantity(text)}
-						placeholder="Quantity"
-						keyboardType="numeric"
-					/>
-					<View style={styles.unitInput}>
-						<RNPickerSelect
-							onValueChange={(value) => setUnit(value)}
-							items={unitList}
-							value={unit}
+						</View>
+						{showSuggestions && (
+							<View style={styles.suggestionsContainer}>
+								{suggestions.map((suggestion) => (
+									<SuggestionItem
+										key={Math.random().toString()}
+										suggestion={suggestion}
+										onPress={(selectedSuggestion) => {
+											setSearchText(selectedSuggestion.name);
+											setShowSuggestions(false);
+										}}
+									/>
+								))}
+							</View>
+						)}
+						<View style={styles.nutritionLabelRow}>
+							<View style={styles.inputLabelContainer}>
+								<Text style={styles.inputLabel}>Quantity</Text>
+							</View>
+							<View style={styles.inputLabelContainerRight}>
+								<Text style={styles.inputLabel}>Unit</Text>
+							</View>
+						</View>
+						<View style={styles.inputRow}>
+							<TextInput
+								style={styles.quantityInput}
+								value={quantity}
+								onChangeText={(text) => setQuantity(text)}
+								placeholder="Quantity"
+								keyboardType="numeric"
+							/>
+							<View style={styles.unitInput}>
+								<RNPickerSelect
+									onValueChange={(value) => setUnit(value)}
+									items={unitList}
+									value={unit}
+									style={{
+										inputAndroid: styles.pickerStyle,
+										inputIOS: styles.pickerStyle,
+									}}
+								/>
+							</View>
+						</View>
+						<View style={styles.datePickerContainer}>
+							<View style={styles.datePickerRow}>
+								<Text style={styles.datePickerLabel}>Select product expiry date:</Text>
+								<DateTimePicker
+									value={date}
+									mode="date"
+									display="calendar"
+									onChange={onChange}
+									minimumDate={new Date()}
+									style={styles.datePicker}
+								/>
+							</View>
+						</View>
+						<View style={styles.separatorContainer}>
+							<View style={styles.line} />
+							<Text style={styles.separatorText}>Nutrition (optional)</Text>
+							<View style={styles.line} />
+						</View>
+						<View style={styles.nutritionLabelRow}>
+							<View style={styles.inputLabelContainer}>
+								<Text style={styles.inputLabel}>Calories (Kcal)</Text>
+							</View>
+							<View style={styles.inputLabelContainerRight}>
+								<Text style={styles.inputLabel}>Carbs (g)</Text>
+							</View>
+						</View>
+						<View style={styles.nutritionInputRow}>
+							<TextInput
+								style={styles.nutritionInput}
+								value={calories}
+								onChangeText={(text) => setCalories(text)}
+								placeholder="Calories (Kcal)"
+								keyboardType="numeric"
+							/>
+							<TextInput
+								style={styles.nutritionInputRight}
+								value={carbs}
+								onChangeText={(text) => setCarbs(text)}
+								placeholder="Carbs (g)"
+								keyboardType="numeric"
+							/>
+						</View>
+						<View style={styles.nutritionLabelRow}>
+							<View style={styles.inputLabelContainer}>
+								<Text style={styles.inputLabel}>Fats (g)</Text>
+							</View>
+							<View style={styles.inputLabelContainerRight}>
+								<Text style={styles.inputLabel}>Protein (g)</Text>
+							</View>
+						</View>
+						<View style={styles.nutritionInputRow}>
+							<TextInput
+								style={styles.nutritionInput}
+								value={fats}
+								onChangeText={(text) => setFats(text)}
+								placeholder="Fats (g)"
+								keyboardType="numeric"
+							/>
+							<TextInput
+								style={styles.nutritionInputRight}
+								value={protein}
+								onChangeText={(text) => setProtein(text)}
+								placeholder="Protein (g)"
+								keyboardType="numeric"
+							/>
+						</View>
+						<TouchableOpacity
+							onPress={handleSubmit}
+							disabled={isSubmitDisabled}
 							style={{
-								inputAndroid: styles.pickerStyle,
-								inputIOS: styles.pickerStyle,
-							}}
-						/>
-					</View>
-				</View>
-				<View style={styles.datePickerContainer}>
-					<View style={styles.datePickerRow}>
-						<Text style={styles.datePickerLabel}>Select product expiry date:</Text>
-						<DateTimePicker
-							value={date}
-							mode="date"
-							display="calendar"
-							onChange={onChange}
-							minimumDate={new Date()}
-							style={styles.datePicker}
-						/>
-					</View>
-				</View>
-				<View style={styles.separatorContainer}>
-					<View style={styles.line} />
-					<Text style={styles.separatorText}>Nutrition (optional)</Text>
-					<View style={styles.line} />
-				</View>
-				<View style={styles.nutritionInputRow}>
-					<TextInput
-						style={styles.nutritionInput}
-						value={calories}
-						onChangeText={(text) => setCalories(text)}
-						placeholder="Calories (Kcal)"
-						keyboardType="numeric"
-					/>
-					<TextInput
-						style={styles.nutritionInput}
-						value={carbs}
-						onChangeText={(text) => setCarbs(text)}
-						placeholder="Carbs (g)"
-						keyboardType="numeric"
-					/>
-				</View>
-				<View style={styles.nutritionInputRow}>
-					<TextInput
-						style={styles.nutritionInput}
-						value={fats}
-						onChangeText={(text) => setFats(text)}
-						placeholder="Fats (g)"
-						keyboardType="numeric"
-					/>
-					<TextInput
-						style={styles.nutritionInput}
-						value={protein}
-						onChangeText={(text) => setProtein(text)}
-						placeholder="Protein (g)"
-						keyboardType="numeric"
-					/>
-				</View>
-				<TouchableOpacity
-					onPress={handleSubmit}
-					disabled={isSubmitDisabled}
-					style={{
-						...styles.submitButton,
-						backgroundColor: isSubmitDisabled ? COLORS.lightGray : COLORS.primary,
-					}}>
-					<Text style={styles.submitButtonText}>Submit</Text>
-				</TouchableOpacity>
+								...styles.submitButton,
+								backgroundColor: isSubmitDisabled ? COLORS.lightGray : COLORS.primary,
+							}}>
+							<Text style={styles.submitButtonText}>Submit</Text>
+						</TouchableOpacity>
+					</>
+				)}
 			</SafeAreaView>
 		</TouchableWithoutFeedback>
 	);

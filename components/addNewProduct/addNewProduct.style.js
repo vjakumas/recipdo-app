@@ -9,11 +9,11 @@ const styles = StyleSheet.create({
 	},
 	logoContainer: {
 		alignItems: "center",
-		marginTop: SIZES.large,
+		marginTop: 5,
 	},
 	logo: {
-		width: "40%",
-		height: 80,
+		width: "39%",
+		height: 41,
 		resizeMode: "contain",
 	},
 	datePickerContainer: {
@@ -42,11 +42,18 @@ const styles = StyleSheet.create({
 		color: COLORS.primary,
 		textDecorationLine: "underline",
 	},
+	productNameLabel: {
+		fontFamily: FONT.semiBold,
+		marginTop: SIZES.medium,
+		marginLeft: SIZES.small,
+		fontSize: 16,
+		color: COLORS.darkGray,
+	},
 	searchContainer: {
 		flexDirection: "row",
 		alignItems: "center",
 		paddingHorizontal: SIZES.medium,
-		marginTop: SIZES.medium,
+		marginTop: 10,
 		backgroundColor: COLORS.white,
 		borderRadius: 15,
 		borderColor: COLORS.lightGray,
@@ -71,7 +78,6 @@ const styles = StyleSheet.create({
 	inputRow: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		marginTop: SIZES.medium,
 		marginBottom: SIZES.small,
 		marginHorizontal: SIZES.small,
 	},
@@ -86,7 +92,6 @@ const styles = StyleSheet.create({
 		paddingRight: SIZES.medium,
 		fontFamily: FONT.regular,
 		fontSize: SIZES.medium,
-		marginRight: SIZES.small,
 	},
 	unitInput: {
 		flex: 1,
@@ -95,18 +100,14 @@ const styles = StyleSheet.create({
 		borderColor: COLORS.lightGray,
 		borderWidth: 1,
 		height: 50,
-		paddingHorizontal: SIZES.medium,
-	},
-	unitInput: {
-		flex: 1,
-		backgroundColor: COLORS.white,
-		borderRadius: 15,
-		borderColor: COLORS.lightGray,
-		borderWidth: 1,
+		paddingLeft: SIZES.medium,
+		paddingRight: SIZES.medium,
+		fontFamily: FONT.regular,
+		fontSize: SIZES.medium,
+		marginLeft: SIZES.small,
 		justifyContent: "center",
 	},
 	pickerStyle: {
-		paddingHorizontal: SIZES.medium,
 		paddingRight: SIZES.medium,
 		fontSize: SIZES.medium,
 		fontFamily: FONT.regular,
@@ -131,10 +132,34 @@ const styles = StyleSheet.create({
 		fontSize: SIZES.medium,
 		color: COLORS.gray,
 	},
+	inputLabel: {
+		fontSize: 16,
+		fontFamily: FONT.semiBold,
+		color: COLORS.darkGray,
+	},
+	inputLabelContainer: {
+		flex: 1,
+		flexDirection: "row",
+		justifyContent: "space-between",
+		marginBottom: 5,
+	},
+	inputLabelContainerRight: {
+		flex: 1,
+		flexDirection: "row",
+		justifyContent: "space-between",
+		marginLeft: 10,
+		marginBottom: 5,
+	},
 	nutritionInputRow: {
 		flexDirection: "row",
 		justifyContent: "space-between",
 		marginBottom: SIZES.small,
+		marginHorizontal: SIZES.small,
+	},
+	nutritionLabelRow: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		marginBottom: 3,
 		marginHorizontal: SIZES.small,
 	},
 	nutritionInput: {
@@ -148,7 +173,19 @@ const styles = StyleSheet.create({
 		paddingRight: SIZES.medium,
 		fontFamily: FONT.regular,
 		fontSize: SIZES.medium,
-		marginRight: SIZES.small,
+	},
+	nutritionInputRight: {
+		flex: 1,
+		backgroundColor: COLORS.white,
+		borderRadius: 15,
+		borderColor: COLORS.lightGray,
+		borderWidth: 1,
+		height: 50,
+		marginLeft: 10,
+		paddingLeft: SIZES.medium,
+		paddingRight: SIZES.medium,
+		fontFamily: FONT.regular,
+		fontSize: SIZES.medium,
 	},
 	submitButton: {
 		backgroundColor: COLORS.primary,
@@ -200,6 +237,13 @@ const styles = StyleSheet.create({
 		borderRadius: 5,
 		marginTop: 5,
 		...SHADOWS.xxLarge,
+	},
+
+	spinnerContainer: {
+		...StyleSheet.absoluteFillObject,
+		justifyContent: "center",
+		alignItems: "center",
+		zIndex: 10,
 	},
 });
 

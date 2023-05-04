@@ -18,7 +18,6 @@ const MainStackNavigator = () => {
 			<MainStack.Screen name="Settings" component={SettingsScreen} />
 			<MainStack.Screen name="Statistics" component={StatisticsScreen} />
 			<MainStack.Screen name="RecipeDetails" component={RecipeDetails} />
-			<MainStack.Screen name="PantryDetails" component={PantryDetails} />
 		</MainStack.Navigator>
 	);
 };
