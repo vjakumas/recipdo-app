@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Image } from "react-native";
-import firebase from "../../config/firebase/config";
+import firebase, { firestore } from "../../config/firebase/config";
 import styles from "./home.style";
 import { COLORS, FONTS, SIZES } from "../../constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import RecipeCardMediumList from "../common/cards/recipeCardMedium/RecipeCardMediumList";
+import RecipeCardMediumSafeFoodList from "../common/cards/recipeCardMediumSafeFood/RecipeCardMediumSafeFoodList";
 import ProfileDropdown from "../common/dropdown/profileDropdown/ProfileDropdown";
+import axios from "axios";
+import Constants from "expo-constants";
 
 const Home = ({ navigation }) => {
 	const [name, setName] = useState("");
+	const [recommendedRecipes, setRecommendedRecipes] = useState([]);
+	const [saveTheFoodRecipes, setSaveTheFoodRecipes] = useState([]);
+	const [makeItAgainRecipes, setMakeItAgainRecipes] = useState([]);
 
 	useEffect(() => {
 		firebase
@@ -25,7 +31,15 @@ const Home = ({ navigation }) => {
 				}
 			});
 		updateExpiringItems();
+		// fetchRecommendedRecipes(); // UNCOMMENT/COMMENT THIS ONE TO DISPLAY RECOMMENDED RECIPES
+		// fetchSaveTheFoodRecipes(); // UNCOMMENT/COMMENT THIS ONE TO DISPLAY SAVE-THE-FOOD RECIPES
+		// fetchMakeItAgainRecipes(); // UNCOMMENT/COMMENT THIS ONE TO DISPLAY MAKE-IT-AGAIN RECIPES
 	}, []);
+
+	const fetchRecommendedRecipes = async () => {
+		const recipes = await getRecommendedRecipes();
+		setRecommendedRecipes(recipes);
+	};
 
 	const profileDropdownRef = useRef(null);
 
@@ -53,14 +67,11 @@ const Home = ({ navigation }) => {
 
 		if (isDateInPast(productsLastCheckDate, today)) {
 			const pantryItems = userData.data().pantryItems;
-			console.log("Pantry items:", pantryItems);
-
-			const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
-			const fiveDaysLaterTimestamp = firebase.firestore.Timestamp.fromDate(fiveDaysLater);
 
 			const updatedPantryItems = pantryItems.map((item) => {
 				const itemDate = item.date.toDate();
-				if (itemDate > today && todayTimestamp <= fiveDaysLaterTimestamp && !item.isExpiringSoon) {
+				console.log(itemDate);
+				if (itemDate > today && itemDate <= fiveDaysLater && !item.isExpiringSoon) {
 					return { ...item, isExpiringSoon: true };
 				}
 				return item;
@@ -68,7 +79,25 @@ const Home = ({ navigation }) => {
 
 			await userRef.update({ pantryItems: updatedPantryItems });
 			await userRef.update({ productsLastCheckDate: firebase.firestore.Timestamp.fromDate(new Date()) });
+			await removeExpiredItems();
 		}
+	};
+
+	const removeExpiredItems = async () => {
+		const userId = firebase.auth().currentUser.uid;
+		const userRef = firebase.firestore().collection("users").doc(userId);
+
+		const userData = await userRef.get();
+		const pantryItems = userData.data().pantryItems;
+		const today = new Date();
+
+		const nonExpiredPantryItems = pantryItems.filter((item) => {
+			const itemDate = item.date.toDate();
+			console.log(item.name + "   " + item.date.toDate() + "   " + today);
+			return itemDate >= today;
+		});
+
+		await userRef.update({ pantryItems: nonExpiredPantryItems });
 	};
 
 	const handleLogout = () => {
@@ -94,48 +123,223 @@ const Home = ({ navigation }) => {
 		navigation.navigate("Statistics");
 	};
 
-	const sampleRecipes = [
-		{
-			id: 1,
-			image: "https://source.unsplash.com/random/?food",
-			type: "Dinner",
-			name: "Delicious Recipe",
-			cookingTime: 30,
-			ingredientsCount: 10,
-		},
-		{
-			id: 2,
-			image: "https://source.unsplash.com/random/?pizza",
-			type: "Lunch",
-			name: "Tasty Pizza",
-			cookingTime: 20,
-			ingredientsCount: 8,
-		},
-		{
-			id: 3,
-			image: "https://source.unsplash.com/random/?pasta",
-			type: "Breakfast",
-			name: "Pasta mamamia",
-			cookingTime: 15,
-			ingredientsCount: 8,
-		},
-		{
-			id: 4,
-			image: "https://source.unsplash.com/random/?burger",
-			type: "Dinner",
-			name: "Juicy Burger",
-			cookingTime: 25,
-			ingredientsCount: 6,
-		},
-		{
-			id: 5,
-			image: "https://source.unsplash.com/random/?dessert",
-			type: "Dessert",
-			name: "Sweet Treat",
-			cookingTime: 10,
-			ingredientsCount: 5,
-		},
-	];
+	const fetchMakeItAgainRecipes = async () => {
+		try {
+			const userId = firebase.auth().currentUser.uid;
+			const userDoc = await firestore.collection("users").doc(userId).get();
+			const finishedRecipeIds = userDoc.data().finishedRecipes || [];
+
+			if (finishedRecipeIds.length > 0) {
+				const recipes = await getRecipeInformationBulk(finishedRecipeIds);
+				setMakeItAgainRecipes(recipes);
+			}
+		} catch (error) {
+			console.error("Error fetching make it again recipes:", error);
+		}
+	};
+
+	const getSimilarRecipes = async (recipeId, number) => {
+		try {
+			const response = await axios({
+				method: "GET",
+				url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${recipeId}/similar`,
+				headers: {
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
+					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+				},
+			});
+
+			return response.data.slice(0, number).map((recipe) => recipe.id);
+		} catch (error) {
+			console.error("Error fetching similar recipes:", error);
+			return [];
+		}
+	};
+
+	const getRandomRecipes = async (number) => {
+		try {
+			const response = await axios({
+				method: "GET",
+				url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random`,
+				params: {
+					number,
+				},
+				headers: {
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
+					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+				},
+			});
+
+			return response.data.recipes.map((recipe) => recipe.id);
+		} catch (error) {
+			console.error("Error fetching random recipes:", error);
+			return [];
+		}
+	};
+
+	const getRecipeInformationBulk = async (recipeIds) => {
+		try {
+			const response = await axios({
+				method: "GET",
+				url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk`,
+				params: {
+					ids: recipeIds.join(","),
+				},
+				headers: {
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
+					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+				},
+			});
+
+			return response.data;
+		} catch (error) {
+			console.error("Error fetching recipe information bulk:", error);
+			return [];
+		}
+	};
+
+	const fetchPantryItems = async (userId) => {
+		const userRef = firestore.collection("users").doc(userId);
+		const userDoc = await userRef.get();
+		const pantryItemsLOL = userDoc.data().pantryItems;
+
+		return pantryItemsLOL;
+	};
+
+	const timestampToDate = (timestamp) => {
+		return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
+	};
+
+	const prioritizePantryItems = (pantryItems) => {
+		const currentDate = new Date();
+
+		const sortItemsByExpiringSoonAndDate = (items) =>
+			items.sort((a, b) => {
+				const aDate = timestampToDate(a.date);
+				const bDate = timestampToDate(b.date);
+
+				const aDaysUntilExpiration = (aDate - currentDate) / (1000 * 60 * 60 * 24);
+				const bDaysUntilExpiration = (bDate - currentDate) / (1000 * 60 * 60 * 24);
+
+				if (a.isExpiringSoon !== b.isExpiringSoon) {
+					return a.isExpiringSoon ? -1 : 1;
+				} else {
+					if (aDaysUntilExpiration < bDaysUntilExpiration) {
+						return -1;
+					} else if (aDaysUntilExpiration > bDaysUntilExpiration) {
+						return 1;
+					} else {
+						return 0;
+					}
+				}
+			});
+
+		const sortedItems = sortItemsByExpiringSoonAndDate(pantryItems);
+
+		return sortedItems;
+	};
+
+	const getSaveTheFoodRecipes = async (userId) => {
+		const pantryItems = await fetchPantryItems(userId);
+		if (pantryItems.length === 0) {
+			const randomRecipes = await getRandomRecipes(10);
+			return randomRecipes;
+		} else {
+			const prioritizedPantryItems = prioritizePantryItems(pantryItems);
+			const recipes = await fetchRecipesForSaveTheFood(prioritizedPantryItems);
+			return recipes;
+		}
+	};
+
+	const fetchRecipesForSaveTheFood = async (prioritizedPantryItems) => {
+		const requiredRecipes = 10;
+		let fetchedRecipes = [];
+
+		const fetchRecipes = async (ingredients) => {
+			const options = {
+				method: "GET",
+				url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients",
+				params: {
+					ingredients: ingredients,
+					number: requiredRecipes - fetchedRecipes.length,
+				},
+				headers: {
+					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+				},
+			};
+			try {
+				const response = await axios.request(options);
+				return response.data;
+			} catch (error) {
+				console.error(error);
+				return [];
+			}
+		};
+
+		for (let i = prioritizedPantryItems.length; i >= 0; i--) {
+			const ingredients = prioritizedPantryItems
+				.slice(0, i)
+				.map((item) => item.name)
+				.join(",");
+			const recipes = await fetchRecipes(ingredients);
+			fetchedRecipes = fetchedRecipes.concat(recipes);
+			if (fetchedRecipes.length >= requiredRecipes) {
+				break;
+			}
+		}
+		return fetchedRecipes;
+	};
+
+	const fetchSaveTheFoodRecipes = async () => {
+		const userId = firebase.auth().currentUser.uid;
+		const recipes = await getSaveTheFoodRecipes(userId);
+		setSaveTheFoodRecipes(recipes);
+	};
+
+	const getRecommendedRecipes = async () => {
+		const userId = firebase.auth().currentUser.uid;
+		const userRef = firestore.collection("users").doc(userId);
+
+		// Get user's saved and finished recipes
+		const userDoc = await userRef.get();
+		const savedRecipes = userDoc.data().savedRecipes;
+		const finishedRecipes = userDoc.data().finishedRecipes;
+
+		let recipeIds = [];
+
+		if (finishedRecipes.length >= 5) {
+			// Get 2 similar recipes for each of the first 5 finished recipes
+			for (let i = 0; i < 5; i++) {
+				const similarRecipesRes = await getSimilarRecipes(finishedRecipes[i], 2);
+				recipeIds = recipeIds.concat(similarRecipesRes);
+			}
+		} else if (finishedRecipes.length > 0) {
+			// Get similar recipes based on the finished and saved recipes according to the specified distribution
+			const recipeDistribution = [
+				[10], // 1 finished recipe
+				[5, 5], // 2 finished recipes
+				[3, 4, 3], // 3 finished recipes
+				[2, 3, 2, 3], // 4 finished recipes
+			];
+
+			const distribution = recipeDistribution[finishedRecipes.length - 1];
+
+			for (let i = 0; i < finishedRecipes.length; i++) {
+				const similarRecipesRes = await getSimilarRecipes(finishedRecipes[i], distribution[i]);
+				recipeIds = recipeIds.concat(similarRecipesRes);
+			}
+		} else {
+			// Display 10 random recipes
+			const randomRecipesRes = await getRandomRecipes(10);
+			recipeIds = randomRecipesRes;
+		}
+
+		// Get detailed information for these recipes using the recipe information bulk API
+		const recommendedRecipes = await getRecipeInformationBulk(recipeIds);
+
+		return recommendedRecipes;
+	};
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -160,7 +364,7 @@ const Home = ({ navigation }) => {
 								<Text style={styles.seeAllText}>See all</Text>
 							</TouchableOpacity>
 						</View>
-						<RecipeCardMediumList recipes={sampleRecipes} navigation={navigation} />
+						<RecipeCardMediumList recipes={recommendedRecipes} navigation={navigation} />
 					</View>
 
 					<View style={styles.categorySection}>
@@ -170,17 +374,7 @@ const Home = ({ navigation }) => {
 								<Text style={styles.seeAllText}>See all</Text>
 							</TouchableOpacity>
 						</View>
-						<RecipeCardMediumList recipes={sampleRecipes} navigation={navigation} />
-					</View>
-
-					<View style={styles.categorySection}>
-						<View style={styles.categoryHeader}>
-							<Text style={styles.categoryTitle}>Time saving recipes</Text>
-							<TouchableOpacity style={styles.seeAllButton}>
-								<Text style={styles.seeAllText}>See all</Text>
-							</TouchableOpacity>
-						</View>
-						<RecipeCardMediumList recipes={sampleRecipes} navigation={navigation} />
+						<RecipeCardMediumSafeFoodList recipes={saveTheFoodRecipes} navigation={navigation} />
 					</View>
 
 					<View style={styles.categorySection}>
@@ -190,7 +384,7 @@ const Home = ({ navigation }) => {
 								<Text style={styles.seeAllText}>See all</Text>
 							</TouchableOpacity>
 						</View>
-						<RecipeCardMediumList recipes={sampleRecipes} navigation={navigation} />
+						<RecipeCardMediumList recipes={makeItAgainRecipes} navigation={navigation} />
 					</View>
 				</View>
 			</ScrollView>

@@ -1,11 +1,11 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import styles from "./recipeCardMedium.style";
+import styles from "./recipeCardMediumSafeFood.style";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
-const RecipeCardMedium = ({ recipe, navigation }) => {
+const RecipeCardMediumSafeFood = ({ recipe, navigation }) => {
 	const handleRecipePress = () => {
 		navigation.navigate("RecipeDetails", { recipe });
 	};
@@ -27,12 +27,15 @@ const RecipeCardMedium = ({ recipe, navigation }) => {
 						<View style={styles.infoItem}>
 							<View style={styles.greenDot} />
 							<Text style={styles.infoText}>
-								{recipe?.extendedIngredients.length ? recipe?.extendedIngredients.length : "N/A"} Ingredients
+								{recipe?.missedIngredientCount || recipe?.usedIngredientCount
+									? (recipe?.missedIngredientCount || 0) + (recipe?.usedIngredientCount || 0)
+									: "N/A"}{" "}
+								Ingredients
 							</Text>
 						</View>
 						<View style={styles.infoItem}>
-							<MaterialCommunityIcons name="clock-outline" size={16} color="white" />
-							<Text style={styles.infoText}>{recipe.readyInMinutes} min</Text>
+							<View style={styles.redDot} />
+							<Text style={styles.infoText}>{recipe?.usedIngredientCount ? recipe?.usedIngredientCount : "N/A"} On hand</Text>
 						</View>
 					</View>
 				</View>
@@ -41,4 +44,4 @@ const RecipeCardMedium = ({ recipe, navigation }) => {
 	);
 };
 
-export default RecipeCardMedium;
+export default RecipeCardMediumSafeFood;

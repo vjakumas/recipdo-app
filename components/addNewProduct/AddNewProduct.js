@@ -209,18 +209,23 @@ const AddNewProduct = () => {
 
 			const dateTimestamp = firebase.firestore.Timestamp.fromDate(inputDate);
 
+			console.log(productImageURL, name, quantity, dateTimestamp, unit, addedDate, calories, carbs, fats, protein);
+
 			const newPantryItem = {
 				pantryId: Date.now().toString(),
-				productImageURL,
-				name,
-				quantity: quantity.replace(",", "."),
-				date: dateTimestamp,
-				unit,
-				addedDate,
-				calories,
-				carbs,
-				fats,
-				protein,
+				productImageURL:
+					productImageURL !== undefined
+						? productImageURL
+						: "https://media.istockphoto.com/id/1409329028/vector/no-picture-available-placeholder-thumbnail-icon-illustration-design.jpg?s=612x612&w=0&k=20&c=_zOuJu755g2eEUioiOUdz_mHKJQJn-tDgIAhQzyeKUQ=",
+				name: name !== undefined ? name : "",
+				quantity: quantity !== undefined ? quantity.replace(",", ".") : "",
+				date: dateTimestamp !== undefined ? dateTimestamp : "",
+				unit: unit !== undefined ? unit : "",
+				addedDate: addedDate !== undefined ? addedDate : "",
+				calories: calories !== undefined ? calories : "",
+				carbs: carbs !== undefined ? carbs : "",
+				fats: fats !== undefined ? fats : "",
+				protein: protein !== undefined ? protein : "",
 				isExpired: false,
 				isExpiringSoon: inputDate >= today && inputDate <= fiveDaysLater,
 			};

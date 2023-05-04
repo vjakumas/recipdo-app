@@ -10,12 +10,13 @@ import axios from "axios";
 import Constants from "expo-constants";
 
 const RecipeDetails = ({ route, navigation }) => {
-	const { recipe } = route.params;
-	const title = recipe.title;
-	const image = recipe.image;
-	const dishType = recipe.dishTypes[0];
-	const readyInMinutes = recipe.readyInMinutes;
-	const instructions = recipe.instructions;
+	console.log(route);
+	const [recipe, setRecipe] = useState(route.params.recipe);
+	const title = recipe?.title || "";
+	const image = recipe?.image || "";
+	const dishType = recipe?.dishTypes?.[0] || "";
+	const readyInMinutes = recipe?.readyInMinutes || 0;
+	const instructions = recipe?.instructions || "";
 	const [pantryItems, setPantryItems] = useState([]);
 	const [ingredients, setIngredients] = useState([]);
 	const [nutritionData, setNutritionData] = useState(null);
@@ -24,6 +25,12 @@ const RecipeDetails = ({ route, navigation }) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [selectedSteps, setSelectedSteps] = useState([]);
 	const [modalVisible, setModalVisible] = useState(false);
+
+	useEffect(() => {
+		if ("missedIngredientCount" in route.params.recipe) {
+			fetchRecipeDetails(route.params.recipe.id);
+		}
+	}, []);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -65,6 +72,25 @@ const RecipeDetails = ({ route, navigation }) => {
 			isCancelled = true;
 		};
 	}, [pantryItems, ingredients]);
+
+	const fetchRecipeDetails = async (recipeId) => {
+		const options = {
+			method: "GET",
+			url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${recipeId}/information`,
+			headers: {
+				"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+			},
+		};
+
+		try {
+			const response = await fetch(options.url, options);
+			const data = await response.json();
+			setRecipe(data);
+		} catch (error) {
+			console.error("Error fetching recipe details:", error);
+		}
+	};
 
 	const toggleSaveRecipe = async () => {
 		const userId = firebase.auth().currentUser.uid;
@@ -462,6 +488,7 @@ const RecipeDetails = ({ route, navigation }) => {
 					<View style={styles.container}>
 						<View style={styles.header}>
 							<Text style={styles.title}>{title}</Text>
+							<Text style={styles.title}>{recipe.recipeId}</Text>
 							<TouchableOpacity style={styles.saveRecipeButton} onPress={toggleSaveRecipe}>
 								{isSaved ? (
 									<MaterialIcons name="favorite" size={24} color="red" />

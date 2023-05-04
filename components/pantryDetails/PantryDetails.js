@@ -67,7 +67,7 @@ const PantryDetails = ({ route }) => {
 	};
 
 	const editProduct = () => {
-		navigation.navigate("EditProduct", {});
+		navigation.navigate("EditProduct", { pantryItem: route.params });
 	};
 
 	const textColor = () => {
