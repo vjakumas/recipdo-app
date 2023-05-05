@@ -52,6 +52,7 @@ const AddNewProduct = () => {
 		{ label: "Pint", value: "pint" },
 		{ label: "Quart", value: "quart" },
 		{ label: "Gallon", value: "gallon" },
+		{ label: "Inch", value: "inch" },
 		{ label: "Unit", value: "unit" },
 	];
 

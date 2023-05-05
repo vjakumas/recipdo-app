@@ -77,8 +77,11 @@ const Home = ({ navigation }) => {
 				return item;
 			});
 
+			const expiringProductsCount = updatedPantryItems.filter((item) => item.isExpiringSoon).length;
+
 			await userRef.update({ pantryItems: updatedPantryItems });
 			await userRef.update({ productsLastCheckDate: firebase.firestore.Timestamp.fromDate(new Date()) });
+			await userRef.update({ expiringProducts: expiringProductsCount });
 			await removeExpiredItems();
 		}
 	};
@@ -91,13 +94,20 @@ const Home = ({ navigation }) => {
 		const pantryItems = userData.data().pantryItems;
 		const today = new Date();
 
+		let expiredProductsCount = 0;
+
 		const nonExpiredPantryItems = pantryItems.filter((item) => {
 			const itemDate = item.date.toDate();
 			console.log(item.name + "   " + item.date.toDate() + "   " + today);
-			return itemDate >= today;
+			if (itemDate < today) {
+				expiredProductsCount++;
+				return false;
+			}
+			return true;
 		});
 
 		await userRef.update({ pantryItems: nonExpiredPantryItems });
+		await userRef.update({ expiredProducts: firebase.firestore.FieldValue.increment(expiredProductsCount) });
 	};
 
 	const handleLogout = () => {

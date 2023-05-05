@@ -10,7 +10,6 @@ import axios from "axios";
 import Constants from "expo-constants";
 
 const RecipeDetails = ({ route, navigation }) => {
-	console.log(route);
 	const [recipe, setRecipe] = useState(route.params.recipe);
 	const title = recipe?.title || "";
 	const image = recipe?.image || "";
@@ -61,7 +60,7 @@ const RecipeDetails = ({ route, navigation }) => {
 			);
 
 			if (!isCancelled) {
-				console.log("Ingredient Availability:", availability);
+				// console.log("Ingredient Availability:", availability);
 				setIngredientAvailability(availability);
 			}
 		};
@@ -167,7 +166,7 @@ const RecipeDetails = ({ route, navigation }) => {
 
 	// Helper function to check if a unit is a common measurement
 	const isCommonMeasurement = (unit) => {
-		const commonMeasurements = ["g", "ml", "kg", "l", "oz", "cup", "tsp", "tbsp", "pint", "quart", "gallon"];
+		const commonMeasurements = ["g", "ml", "kg", "l", "oz", "cup", "tsp", "tbsp", "pint", "quart", "gallon", "inch"];
 		return commonMeasurements.includes(unit.toLowerCase());
 	};
 
@@ -222,7 +221,6 @@ const RecipeDetails = ({ route, navigation }) => {
 			for (const item of matchingPantryItems) {
 				totalPantryItemQuantity += parseInt(item.quantity);
 			}
-			console.log("DUXAS " + ingredient.name + " " + parseInt(totalPantryItemQuantity) + " " + parseInt(ingredient.amount.metric.value));
 			return totalPantryItemQuantity >= parseInt(ingredient.amount.metric.value);
 		}
 
@@ -315,7 +313,6 @@ const RecipeDetails = ({ route, navigation }) => {
 
 			let totalPantryItemSum = 0;
 			for (const item of matchingPantryItems) {
-				console.log(item.quantity);
 				totalPantryItemSum += parseFloat(item.quantity);
 			}
 			const ingredientUnit = ingredient.amount.metric.unit || "unit";
@@ -341,13 +338,15 @@ const RecipeDetails = ({ route, navigation }) => {
 		const userId = firebase.auth().currentUser.uid;
 		const userRef = firestore.collection("users").doc(userId);
 
+		let consumedProductsCount = 0;
+		let consumedProductsList = [];
+
 		for (const ingredient of ingredients) {
 			const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
 
 			if (matchingPantryItems.length > 0) {
 				matchingPantryItems.sort((a, b) => a.date - b.date);
 				let remainingAmount = ingredient.amount.metric.value;
-				console.log("REMAINING: " + remainingAmount);
 				for (const pantryItem of matchingPantryItems) {
 					if (isCommonMeasurement(ingredient.amount.metric.unit)) {
 						const convertedAmount = await convertIngredientAmount(
@@ -356,7 +355,8 @@ const RecipeDetails = ({ route, navigation }) => {
 							pantryItem.unit,
 							pantryItem.quantity
 						);
-						if (convertedAmount >= remainingAmount) {
+						console.log("Converted amount:" + " " + convertedAmount + "   REMAINING:" + remainingAmount);
+						if (convertedAmount > remainingAmount) {
 							const convertedAmountToOriginal = await convertIngredientAmount(
 								ingredient.name,
 								pantryItem.unit,
@@ -367,12 +367,29 @@ const RecipeDetails = ({ route, navigation }) => {
 							remainingAmount = 0;
 						} else {
 							remainingAmount -= convertedAmount;
+							consumedProductsCount += 1;
+
+							const newItem = {
+								name: pantryItem.name,
+								pantryId: pantryItem.pantryId,
+								image: pantryItem.productImageURL,
+								consumedDate: new Date(),
+								quantity: pantryItem.quantity,
+								unit: pantryItem.unit,
+								expiredDate: pantryItem.date,
+								addedDate: pantryItem.addedDate,
+								calories: pantryItem.calories,
+								fat: pantryItem.fats,
+								carbs: pantryItem.carbs,
+								protein: pantryItem.protein,
+							};
+
+							consumedProductsList.push(newItem);
+
 							pantryItem.quantity = 0;
 
-							// Find the index of the pantryItem in the pantryItems array
 							const index = pantryItems.indexOf(pantryItem);
 							if (index !== -1) {
-								// Remove the pantryItem from the pantryItems array
 								pantryItems.splice(index, 1);
 							}
 						}
@@ -386,12 +403,28 @@ const RecipeDetails = ({ route, navigation }) => {
 							remainingAmount = 0;
 						} else {
 							remainingAmount -= pantryItem.quantity;
+
+							const newItem = {
+								name: pantryItem.name,
+								pantryId: pantryItem.pantryId,
+								image: pantryItem.productImageURL,
+								consumedDate: new Date(),
+								quantity: pantryItem.quantity,
+								unit: pantryItem.unit,
+								expiredDate: pantryItem.date,
+								addedDate: pantryItem.addedDate,
+								calories: pantryItem.calories,
+								fat: pantryItem.fats,
+								carbs: pantryItem.carbs,
+								protein: pantryItem.protein,
+							};
+
+							consumedProductsList.push(newItem);
+
 							pantryItem.quantity = 0;
 
-							// Find the index of the pantryItem in the pantryItems array
 							const index = pantryItems.indexOf(pantryItem);
 							if (index !== -1) {
-								// Remove the pantryItem from the pantryItems array
 								pantryItems.splice(index, 1);
 							}
 						}
@@ -405,8 +438,19 @@ const RecipeDetails = ({ route, navigation }) => {
 				await userRef.update({
 					pantryItems: pantryItems,
 				});
+				updateConsumedProducts(consumedProductsCount, consumedProductsList);
 			}
 		}
+	};
+
+	const updateConsumedProducts = async (count, list) => {
+		const userId = firebase.auth().currentUser.uid;
+		const userRef = firestore.collection("users").doc(userId);
+
+		await userRef.update({
+			consumedProducts: firebase.firestore.FieldValue.increment(count),
+			consumedProductsList: firebase.firestore.FieldValue.arrayUnion(...list),
+		});
 	};
 
 	const onInstructionStepClick = (index) => {
@@ -450,7 +494,7 @@ const RecipeDetails = ({ route, navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<Modal animationType="slide" transparent={true} visible={modalVisible}>
+			<Modal animationType="fade" transparent={true} visible={modalVisible}>
 				<TouchableWithoutFeedback onPress={hideModal}>
 					<View style={styles.modalOverlay}>
 						<View style={styles.modalContainer}>
@@ -460,7 +504,7 @@ const RecipeDetails = ({ route, navigation }) => {
 								<TouchableOpacity style={styles.modalCancelButton} onPress={hideModal}>
 									<Text style={styles.modalCancelButtonText}>Cancel</Text>
 								</TouchableOpacity>
-								<TouchableOpacity style={styles.modalConfirmButton} onPress={() => finishRecipe(recipe.id)}>
+								<TouchableOpacity style={styles.modalConfirmButton} onPress={() => finishRecipe(recipe)}>
 									<Text style={styles.modalConfirmButtonText}>Confirm</Text>
 								</TouchableOpacity>
 							</View>

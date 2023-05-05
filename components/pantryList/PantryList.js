@@ -17,7 +17,6 @@ const PantryList = () => {
 	const [expiringSoonProducts, setExpiringSoonProducts] = useState([]);
 	const [filteredProducts, setFilteredProducts] = useState([]);
 	const navigation = useNavigation();
-
 	useEffect(() => {
 		const user = firebase.auth().currentUser;
 		if (user) {
@@ -25,7 +24,7 @@ const PantryList = () => {
 				.firestore()
 				.collection("users")
 				.doc(user.uid)
-				.onSnapshot((doc) => {
+				.onSnapshot(async (doc) => {
 					const pantryItems = doc.data().pantryItems;
 					const expiringSoon = pantryItems
 						.filter((product) => product.isExpiringSoon)
@@ -38,6 +37,8 @@ const PantryList = () => {
 					setExpiringSoonProducts(expiringSoon);
 					setRemainingProducts(remaining);
 					setAllProducts(pantryItems);
+
+					await updateExpiringProducts(expiringSoon.length);
 				});
 
 			return () => {
@@ -61,6 +62,13 @@ const PantryList = () => {
 	const handleSearch = async () => {
 		const searchResults = allProducts.filter((product) => product.name.toLowerCase().includes(searchText.toLowerCase()));
 		setFilteredProducts(searchResults);
+	};
+
+	const updateExpiringProducts = async (expiringCount) => {
+		const userId = firebase.auth().currentUser.uid;
+		const userRef = firebase.firestore().collection("users").doc(userId);
+
+		await userRef.update({ expiringProducts: expiringCount });
 	};
 
 	const displayExpiringSoonProducts =

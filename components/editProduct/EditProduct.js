@@ -24,7 +24,7 @@ import axios from "axios";
 const EditProduct = ({ route }) => {
 	const { pantryItem } = route.params;
 	const [show, setShow] = useState(false);
-	const [name, setName] = useState(pantryItem.name || "");
+	const [name, setSearchText] = useState(pantryItem.name || "");
 	const [quantity, setQuantity] = useState(pantryItem.quantity || "");
 	const [unit, setUnit] = useState(pantryItem.unit || "");
 	const initialDate = pantryItem.date ? pantryItem.date.toDate() : new Date();
@@ -56,6 +56,7 @@ const EditProduct = ({ route }) => {
 		{ label: "Pint", value: "pint" },
 		{ label: "Quart", value: "quart" },
 		{ label: "Gallon", value: "gallon" },
+		{ label: "Inch", value: "inch" },
 		{ label: "Unit", value: "unit" },
 	];
 
