@@ -30,7 +30,7 @@ const AddProduct = ({ navigation }) => {
 						<Text style={styles.secondaryButtonText}>Scan a product</Text>
 					</View>
 				</TouchableOpacity>
-				<TouchableOpacity onPress={() => console.log("Scan a barcode")} style={styles.secondaryButton}>
+				<TouchableOpacity onPress={() => navigation.navigate("AddNewProductBarcode")} style={styles.secondaryButton}>
 					<View style={styles.buttonContent}>
 						<Icon name="barcode" size={24} style={{ marginRight: 10, color: COLORS.darkGray }} />
 						<Text style={styles.secondaryButtonText}>Scan a barcode</Text>

@@ -393,7 +393,7 @@ const EditProduct = ({ route }) => {
 								...styles.submitButton,
 								backgroundColor: isSubmitDisabled ? COLORS.lightGray : COLORS.primary,
 							}}>
-							<Text style={styles.submitButtonText}>Submit</Text>
+							<Text style={styles.submitButtonText}>Save</Text>
 						</TouchableOpacity>
 					</>
 				)}

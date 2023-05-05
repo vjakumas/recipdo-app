@@ -12,6 +12,7 @@ import Constants from "expo-constants";
 const RecipeDetails = ({ route, navigation }) => {
 	const [recipe, setRecipe] = useState(route.params.recipe);
 	const title = recipe?.title || "";
+	const servings = recipe?.servings || "";
 	const image = recipe?.image || "";
 	const dishType = recipe?.dishTypes?.[0] || "";
 	const readyInMinutes = recipe?.readyInMinutes || 0;
@@ -275,14 +276,31 @@ const RecipeDetails = ({ route, navigation }) => {
 		}
 	};
 
-	const finishRecipe = async (recipeId) => {
+	const finishRecipe = async (recipe) => {
 		const userId = firebase.auth().currentUser.uid;
 		const userRef = firestore.collection("users").doc(userId);
 
 		try {
+			const userDoc = await userRef.get();
+			const finishedRecipes = userDoc.data().finishedRecipes;
+
+			const newRecipe = {
+				id: recipe.id,
+				title: recipe.title,
+				servings: recipe.servings,
+				readyInMinutes: recipe.readyInMinutes,
+				image: recipe.image,
+				extendedIngredients: recipe.extendedIngredients,
+				dishTypes: recipe.dishTypes,
+				instructions: recipe.instructions,
+			};
+
+			finishedRecipes.push(newRecipe);
+
 			await userRef.update({
-				finishedRecipes: firebase.firestore.FieldValue.arrayUnion(recipeId),
+				finishedRecipes: finishedRecipes,
 			});
+
 			await subtractIngredients();
 
 			Toast.show({
@@ -532,7 +550,6 @@ const RecipeDetails = ({ route, navigation }) => {
 					<View style={styles.container}>
 						<View style={styles.header}>
 							<Text style={styles.title}>{title}</Text>
-							<Text style={styles.title}>{recipe.recipeId}</Text>
 							<TouchableOpacity style={styles.saveRecipeButton} onPress={toggleSaveRecipe}>
 								{isSaved ? (
 									<MaterialIcons name="favorite" size={24} color="red" />
@@ -541,19 +558,20 @@ const RecipeDetails = ({ route, navigation }) => {
 								)}
 							</TouchableOpacity>
 						</View>
+						<Text style={styles.servings}>{servings} servings</Text>
 						{nutritionData && (
 							<View style={styles.nutritionContainer}>
 								<Text style={styles.nutritionTitle}>Nutrition Facts</Text>
 								<View style={styles.nutritionRow}>
 									<View style={styles.nutritionItem}>
 										<View style={styles.nutritionIcon}>
-											<MaterialIcons name="local-fire-department" size={24} color={COLORS.secondary} />
+											<MaterialIcons name="local-fire-department" size={24} color={COLORS.darkGray} />
 										</View>
 										<Text style={styles.nutritionText}>{nutritionData.calories} Kcal</Text>
 									</View>
 									<View style={styles.nutritionItem}>
 										<View style={styles.nutritionIcon}>
-											<MaterialIcons name="free-breakfast" size={24} color={COLORS.secondary} />
+											<MaterialIcons name="free-breakfast" size={24} color={COLORS.darkGray} />
 										</View>
 										<Text style={styles.nutritionText}>{nutritionData.carbs} carbs</Text>
 									</View>
@@ -561,13 +579,13 @@ const RecipeDetails = ({ route, navigation }) => {
 								<View style={styles.nutritionRow}>
 									<View style={styles.nutritionItem}>
 										<View style={styles.nutritionIcon}>
-											<MaterialIcons name="fitness-center" size={24} color={COLORS.secondary} />
+											<MaterialIcons name="fitness-center" size={24} color={COLORS.darkGray} />
 										</View>
 										<Text style={styles.nutritionText}>{nutritionData.protein} protein</Text>
 									</View>
 									<View style={styles.nutritionItem}>
 										<View style={styles.nutritionIcon}>
-											<MaterialIcons name="fastfood" size={24} color={COLORS.secondary} />
+											<MaterialIcons name="fastfood" size={24} color={COLORS.darkGray} />
 										</View>
 										<Text style={styles.nutritionText}>{nutritionData.fat} fat</Text>
 									</View>

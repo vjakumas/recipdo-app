@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
 		backgroundColor: COLORS.white,
 		borderRadius: 10,
 		padding: 10,
-		marginBottom: 10,
+		marginBottom: 15,
 		elevation: 3, // For Android
 		shadowColor: COLORS.black, // For iOS
 		shadowOffset: { width: 0, height: 2 }, // For iOS
@@ -51,20 +51,28 @@ const styles = StyleSheet.create({
 		shadowRadius: 2, // For iOS
 	},
 	topThreeContainer: {
-		flexDirection: "column",
-		alignItems: "flex-start",
-		justifyContent: "center",
 		width: "100%",
+	},
+	topThreeIndex: {
+		fontSize: 18,
+		fontFamily: FONT.bold,
+		marginRight: 10,
+	},
+	topThreeName: {
+		fontSize: 16,
+		fontFamily: FONT.regular,
+		marginRight: 10,
 	},
 	topThreeItem: {
 		flexDirection: "row",
+		justifyContent: "space-between",
 		alignItems: "center",
-		marginBottom: 5,
-		marginLeft: 8,
+		marginLeft: 10,
+		marginBottom: 8,
 	},
 	topThreeLabel: {
 		fontSize: 18,
-		fontWeight: "bold",
+		fontFamily: FONT.medium,
 		marginRight: 10,
 	},
 	iconAndLabelContainer: {
@@ -75,6 +83,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		marginLeft: 8,
+		marginBottom: 10,
 	},
 	statisticLabelContainer: {
 		flexDirection: "row",
@@ -86,11 +95,10 @@ const styles = StyleSheet.create({
 	statisticCardContent: {
 		fontFamily: FONT.bold,
 		marginLeft: 15,
-		backgroundColor: "green",
 		justifyContent: "center",
 	},
 	label: {
-		marginLeft: 10, // Add a margin to separate label from the icon
+		marginLeft: 10,
 		fontSize: SIZES.medium,
 		fontFamily: FONT.regular,
 	},
@@ -100,9 +108,11 @@ const styles = StyleSheet.create({
 		color: COLORS.green,
 	},
 	valueTop3: {
+		textAlign: "center",
+		marginRight: 8,
 		fontSize: 20,
 		fontFamily: FONT.semiBold,
-		color: COLORS.primary,
+		color: COLORS.darkGray,
 	},
 	pieChartContainer: {
 		marginBottom: 20,

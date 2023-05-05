@@ -19,6 +19,7 @@ const Statistic = () => {
 	});
 	const [topConsumedProducts, setTopConsumedProducts] = useState([]);
 	const [topFavoriteRecipes, setTopFavoriteRecipes] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -28,8 +29,6 @@ const Statistic = () => {
 				const doc = await docRef.get();
 				if (doc.exists) {
 					setUserData(doc.data());
-					setTopConsumedProducts(getTopConsumedProducts(userData.consumedProductsList));
-					setTopFavoriteRecipes(getTopFavoriteRecipes(userData.finishedRecipes));
 				} else {
 					console.log("No such document!");
 				}
@@ -39,7 +38,18 @@ const Statistic = () => {
 		};
 
 		fetchData();
+
+		const timer = setTimeout(() => {
+			setIsLoading(false);
+		}, 500);
+
+		return () => clearTimeout(timer);
 	}, []);
+
+	useEffect(() => {
+		setTopConsumedProducts(getTopConsumedProducts(userData.consumedProductsList));
+		setTopFavoriteRecipes(getTopFavoriteRecipes(userData.finishedRecipes));
+	}, [userData]);
 
 	const renderPieLabel = ({ slices, height, width }) => {
 		console.log("Rendering pie labels");
@@ -159,37 +169,37 @@ const Statistic = () => {
 						</View>
 						<Text style={styles.value}>{userData.finishedRecipes.length}</Text>
 					</View>
-					<View style={styles.topThreeItemContainer}>
+					<View style={[styles.topThreeItemContainer, styles.topThreeContainer]}>
 						<View style={styles.iconAndLabelContainerTop3}>
 							<MaterialIcons name="leaderboard" size={30} color={COLORS.secondary} />
 							<Text style={styles.label}>Top 3 Most Consumed Products:</Text>
 						</View>
-						<View style={styles.topThreeContainer}>
-							{topConsumedProducts.map((product, index) => (
-								<View style={styles.topThreeItem} key={index}>
-									<Text style={styles.topThreeLabel}>
-										{index + 1}. {product.name.charAt(0).toUpperCase() + product.name.slice(1)}:
-									</Text>
-									<Text style={styles.valueTop3}>{product.count}</Text>
+						{topConsumedProducts.map((product, index) => (
+							<View style={styles.topThreeItem} key={index}>
+								<Text style={styles.topThreeIndex}>{index + 1}. </Text>
+								<View style={{ flex: 1 }}>
+									<Text style={styles.topThreeName}>{product.name.charAt(0).toUpperCase() + product.name.slice(1)}</Text>
 								</View>
-							))}
-						</View>
+								<Text style={styles.valueTop3}>{product.count}</Text>
+							</View>
+						))}
 					</View>
-					<View style={styles.topThreeItemContainer}>
+					<View style={[styles.topThreeItemContainer, styles.topThreeContainer]}>
 						<View style={styles.iconAndLabelContainerTop3}>
-							<MaterialIcons name="favorite" size={30} color={COLORS.secondary} />
-							<Text style={styles.label}>Top 3 Favorite Recipes:</Text>
+							<MaterialIcons name="leaderboard" size={30} color={COLORS.secondary} />
+							<Text style={styles.label}>Top 3 Most Consumed Products:</Text>
 						</View>
-						<View style={styles.topThreeContainer}>
-							{topFavoriteRecipes.map((recipe, index) => (
-								<View style={styles.topThreeItem} key={index}>
-									<Text style={styles.topThreeLabel}>
-										{index + 1}. {recipe.title ? recipe.title.charAt(0).toUpperCase() + recipe.title.slice(1) : "N/A"}:
+						{topFavoriteRecipes.map((recipe, index) => (
+							<View style={styles.topThreeItem} key={index}>
+								<Text style={styles.topThreeIndex}>{index + 1}. </Text>
+								<View style={{ flex: 1 }}>
+									<Text style={styles.topThreeName}>
+										{recipe.title ? recipe.title.charAt(0).toUpperCase() + recipe.title.slice(1) : "N/A"}
 									</Text>
-									<Text style={styles.valueTop3}>{recipe.count}</Text>
 								</View>
-							))}
-						</View>
+								<Text style={styles.valueTop3}>{recipe.count}</Text>
+							</View>
+						))}
 					</View>
 				</View>
 			</ScrollView>

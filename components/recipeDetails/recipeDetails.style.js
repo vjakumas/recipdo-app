@@ -28,9 +28,17 @@ const styles = StyleSheet.create({
 	title: {
 		flex: 1, // Add this line
 		fontSize: 24,
-		fontWeight: "bold",
+		fontFamily: FONT.bold,
 		marginRight: 8, // Add some margin to the right
 		flexWrap: "wrap", // Add this line
+	},
+	servings: {
+		flex: 1,
+		fontSize: 16,
+		fontFamily: FONT.medium,
+		color: COLORS.gray,
+		marginRight: 8,
+		flexWrap: "wrap",
 	},
 	saveRecipeButton: {
 		paddingLeft: 8,
@@ -93,7 +101,7 @@ const styles = StyleSheet.create({
 		fontFamily: FONT.bold,
 		marginTop: 10,
 		marginLeft: 10,
-		color: COLORS.secondary,
+		color: COLORS.darkGray,
 	},
 	nutritionIcon: {
 		backgroundColor: COLORS.lightGray,
