@@ -33,6 +33,7 @@ const AddNewProduct = () => {
 	const [name, setSearchText] = useState("");
 	const [searchTimeout, setSearchTimeout] = useState(null);
 	const [suggestions, setSuggestions] = useState([]);
+	const [productImage, setProductImage] = useState(null);
 	const [showSuggestions, setShowSuggestions] = useState(false);
 	const [submitButtonColor, setSubmitButtonColor] = useState(COLORS.lightGray);
 	const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
@@ -69,7 +70,7 @@ const AddNewProduct = () => {
 			setSearchTimeout(
 				setTimeout(() => {
 					getSuggestions();
-				}, 500)
+				}, 300)
 			);
 		} else {
 			setSuggestions([]);
@@ -218,6 +219,9 @@ const AddNewProduct = () => {
 			};
 
 			const response = await axios.request(options);
+
+			setProductImage(response.data[0].image);
+
 			return response.data.length > 0;
 		} catch (error) {
 			console.error("Error checking recipe:", error);
@@ -235,7 +239,16 @@ const AddNewProduct = () => {
 
 			const recipeExists = await checkRecipeExists(name);
 			if (!recipeExists) {
-				alert("Product name is not valid. Please try again");
+				Toast.show({
+					type: "error",
+					text1: "Product name is not valid!",
+					text2: "Please try again.",
+					visibilityTime: 4000,
+					autoHide: true,
+					topOffset: 60,
+					bottomOffset: 40,
+				});
+				setLoading(false);
 				return;
 			}
 

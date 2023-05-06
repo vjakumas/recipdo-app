@@ -36,12 +36,12 @@ const Home = ({ navigation }) => {
 		updateExpiringItems();
 
 		// COMMENT/UNCOMMENT THIS LINE TO FETCH RECIPES
-		// setLoading(false);
+		setLoading(false);
 
 		// UNCOMMENT/COMMENT THIS CODE TO FETCH RECIPES
-		Promise.all([fetchRecommendedRecipes(), fetchSaveTheFoodRecipes(), fetchMakeItAgainRecipes()]).then(() => {
-			setLoading(false);
-		});
+		// Promise.all([fetchRecommendedRecipes(), fetchSaveTheFoodRecipes(), fetchMakeItAgainRecipes()]).then(() => {
+		// 	setLoading(false);
+		// });
 	}, []);
 
 	const fetchRecommendedRecipes = async () => {
@@ -392,6 +392,15 @@ const Home = ({ navigation }) => {
 			) : (
 				<ScrollView showsVerticalScrollIndicator={false}>
 					<View style={styles.recipesContainer}>
+						<View style={styles.categorySectionSaveTheFood}>
+							<View style={styles.categoryHeaderSaveTheFood}>
+								<Text style={styles.categoryTitleSaveTheFood}>Save-the-food recipes</Text>
+								{/* <TouchableOpacity style={styles.seeAllButton}>
+									<Text style={styles.seeAllText}>See all</Text>
+								</TouchableOpacity> */}
+							</View>
+							<RecipeCardMediumSafeFoodList recipes={saveTheFoodRecipes} navigation={navigation} />
+						</View>
 						<View style={styles.categorySection}>
 							<View style={styles.categoryHeader}>
 								<Text style={styles.categoryTitle}>Recommended for you</Text>
@@ -400,16 +409,6 @@ const Home = ({ navigation }) => {
 								</TouchableOpacity> */}
 							</View>
 							<RecipeCardMediumList recipes={recommendedRecipes} navigation={navigation} />
-						</View>
-
-						<View style={styles.categorySection}>
-							<View style={styles.categoryHeader}>
-								<Text style={styles.categoryTitle}>Save-the-food recipes</Text>
-								{/* <TouchableOpacity style={styles.seeAllButton}>
-									<Text style={styles.seeAllText}>See all</Text>
-								</TouchableOpacity> */}
-							</View>
-							<RecipeCardMediumSafeFoodList recipes={saveTheFoodRecipes} navigation={navigation} />
 						</View>
 
 						<View style={styles.categorySection}>

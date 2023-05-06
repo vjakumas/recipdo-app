@@ -1,15 +1,10 @@
 import { StyleSheet } from "react-native";
 import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#f8f8f8",
-	},
-	container: {
-		flex: 1,
-		backgroundColor: "white",
+		backgroundColor: COLORS.white,
 	},
 	topBar: {
 		flexDirection: "row",
@@ -67,11 +62,29 @@ const styles = StyleSheet.create({
 	},
 	categoryTitle: {
 		fontSize: 20,
-		fontWeight: "bold",
+		fontFamily: FONT.semiBold,
 		marginLeft: 0,
 		marginBottom: 8,
 	},
 	categoryHeader: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		paddingHorizontal: 16,
+		marginBottom: 8,
+	},
+	categorySectionSaveTheFood: {
+		marginBottom: -20,
+		marginTop: 0,
+	},
+	categoryTitleSaveTheFood: {
+		fontSize: 20,
+		fontFamily: FONT.bold,
+		color: COLORS.primary,
+		marginLeft: 0,
+		marginBottom: 8,
+	},
+	categoryHeaderSaveTheFood: {
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",

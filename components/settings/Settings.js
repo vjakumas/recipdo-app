@@ -36,9 +36,6 @@ const Settings = () => {
 					const data = doc.data();
 					setName(data.name);
 					setEmail(data.email);
-					if (data.profileImageUrl) {
-						setProfileImageSource({ uri: data.profileImageUrl });
-					}
 				});
 		}
 	}, [user]);
@@ -63,6 +60,10 @@ const Settings = () => {
 			if (name) {
 				await user.updateProfile({ displayName: name });
 				await usersRef.doc(user.uid).update({ name });
+				Toast.show({
+					type: "success",
+					text1: "Profile updated successfully!",
+				});
 			}
 
 			if (email && email !== user.email) {
@@ -78,12 +79,12 @@ const Settings = () => {
 
 			if (password) {
 				await user.updatePassword(password);
+				Toast.show({
+					type: "info",
+					text1: "Email verification sent!",
+					text2: "Please check your inbox to verify your new email address.",
+				});
 			}
-
-			Toast.show({
-				type: "success",
-				text1: "Profile updated successfully!",
-			});
 		} catch (error) {
 			console.log(error.message);
 			Toast.show({
@@ -136,7 +137,7 @@ const Settings = () => {
 				</View>
 				<TouchableOpacity onPress={handleUpdate} style={styles.primaryButton}>
 					<View style={styles.buttonContent}>
-						<Text style={styles.primaryButtonText}>Add new product</Text>
+						<Text style={styles.primaryButtonText}>Save</Text>
 					</View>
 				</TouchableOpacity>
 			</SafeAreaView>

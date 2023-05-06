@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: "100%",
 		marginTop: "-7%",
+		backgroundColor: "#fff",
 	},
 	logoImage: {
 		resizeMode: "contain",
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
 	mainContainer: {
 		flex: 1,
 		borderRadius: 30,
-		backgroundColor: COLORS.white,
+		backgroundColor: "#fff",
 	},
 	container: {
 		flex: 1,
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
 	signUpButton: {
 		width: "100%",
 		height: 65,
-		backgroundColor: COLORS.white,
+		backgroundColor: "#fff",
 		borderRadius: SIZES.medium,
 		justifyContent: "center",
 		alignItems: "center",

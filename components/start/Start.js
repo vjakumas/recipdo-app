@@ -10,7 +10,7 @@ const Start = () => {
 	const navigation = useNavigation();
 
 	return (
-		<View style={{ flex: 1 }}>
+		<View style={{ flex: 1, backgroundColor: "#fff" }}>
 			<View style={{ height: "40%", width: "100%" }}>
 				<Image style={styles.topImage} source={require("../../assets/images/start-top.png")} />
 			</View>

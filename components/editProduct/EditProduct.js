@@ -182,7 +182,6 @@ const EditProduct = ({ route }) => {
 	};
 
 	const handleSubmit = async () => {
-		console.log("CBB");
 		try {
 			setLoading(true);
 			if (!name || !quantity) {
@@ -192,7 +191,16 @@ const EditProduct = ({ route }) => {
 
 			const recipeExists = await checkRecipeExists(name);
 			if (!recipeExists) {
-				alert("Product name is not valid. Please try again");
+				Toast.show({
+					type: "error",
+					text1: "Product name is not valid!",
+					text2: "Please try again.",
+					visibilityTime: 4000,
+					autoHide: true,
+					topOffset: 60,
+					bottomOffset: 40,
+				});
+				setLoading(false);
 				return;
 			}
 

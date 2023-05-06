@@ -1,5 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, Image, FlatList, ActivityIndicator } from "react-native";
+import {
+	View,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	SafeAreaView,
+	Image,
+	FlatList,
+	ActivityIndicator,
+	TouchableWithoutFeedback,
+	Keyboard,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "./search.styles";
@@ -120,6 +131,10 @@ const Search = () => {
 		navigation.navigate("RecipeDetails", { recipe: recipe });
 	};
 
+	const dismissKeyboard = () => {
+		Keyboard.dismiss();
+	};
+
 	const renderSearchTypeButton = (type) => {
 		const isSelected = searchType === type;
 
@@ -133,55 +148,57 @@ const Search = () => {
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<View style={styles.logoContainer}>
-				<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} resizeMode="contain" />
-			</View>
-			<View style={styles.searchContainer}>
-				<View style={styles.searchIconContainer}>
-					<Ionicons name="search" size={20} color={COLORS.gray} />
+		<TouchableWithoutFeedback onPress={dismissKeyboard}>
+			<SafeAreaView style={styles.container}>
+				<View style={styles.logoContainer}>
+					<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} resizeMode="contain" />
 				</View>
-				<TextInput
-					style={styles.searchInput}
-					value={searchText}
-					onChangeText={(text) => setSearchText(text)}
-					placeholder="Search..."
-					returnKeyType="search"
-					onSubmitEditing={handleSearch}
-				/>
-			</View>
-			<View style={styles.buttonsContainer}>
-				{renderSearchTypeButton("Name")}
-				{renderSearchTypeButton("Ingredients")}
-			</View>
-			{searchResultsData.length > 0 && (
-				<View>
-					<Text style={styles.searchResultsHeading}>Search Results</Text>
+				<View style={styles.searchContainer}>
+					<View style={styles.searchIconContainer}>
+						<Ionicons name="search" size={20} color={COLORS.gray} />
+					</View>
+					<TextInput
+						style={styles.searchInput}
+						value={searchText}
+						onChangeText={(text) => setSearchText(text)}
+						placeholder="Search..."
+						returnKeyType="search"
+						onSubmitEditing={handleSearch}
+					/>
 				</View>
-			)}
-			{loading ? (
-				<ActivityIndicator size="large" style={{ marginTop: 225 }} color={COLORS.primary} />
-			) : (
-				<>
-					{searchResultsData.length === 0 && (
-						<View style={styles.noResultsContainer}>
-							<Text style={styles.noResultsLabel}>Let's Get Cooking!</Text>
-							<Text style={styles.noResultsSublabel}>Find delicious recipes for any occasion</Text>
-						</View>
-					)}
-					<FlatList
-						contentContainerStyle={styles.flatListContainer}
-						data={searchResultsData}
-						renderItem={({ item }) => (
-							<View key={item.id}>
-								<RecipeCard recipe={item} onPress={() => onRecipePress(item)} />
+				<View style={styles.buttonsContainer}>
+					{renderSearchTypeButton("Name")}
+					{renderSearchTypeButton("Ingredients")}
+				</View>
+				{searchResultsData.length > 0 && (
+					<View>
+						<Text style={styles.searchResultsHeading}>Search Results</Text>
+					</View>
+				)}
+				{loading ? (
+					<ActivityIndicator size="large" style={{ marginTop: 225 }} color={COLORS.primary} />
+				) : (
+					<>
+						{searchResultsData.length === 0 && (
+							<View style={styles.noResultsContainer}>
+								<Text style={styles.noResultsLabel}>Let's Get Cooking!</Text>
+								<Text style={styles.noResultsSublabel}>Find delicious recipes for any occasion</Text>
 							</View>
 						)}
-						keyExtractor={(item) => item.id.toString()}
-					/>
-				</>
-			)}
-		</SafeAreaView>
+						<FlatList
+							contentContainerStyle={styles.flatListContainer}
+							data={searchResultsData}
+							renderItem={({ item }) => (
+								<View key={item.id}>
+									<RecipeCard recipe={item} onPress={() => onRecipePress(item)} />
+								</View>
+							)}
+							keyExtractor={(item) => item.id.toString()}
+						/>
+					</>
+				)}
+			</SafeAreaView>
+		</TouchableWithoutFeedback>
 	);
 };
 

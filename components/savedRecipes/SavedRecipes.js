@@ -100,7 +100,7 @@ const SavedRecipes = () => {
 	};
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
 			<View style={styles.logoContainer}>
 				<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} />
 			</View>

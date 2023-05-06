@@ -388,7 +388,6 @@ const RecipeDetails = ({ route, navigation }) => {
 							pantryItem.unit,
 							pantryItem.quantity
 						);
-						console.log("Converted amount:" + " " + convertedAmount + "   REMAINING:" + remainingAmount);
 						if (convertedAmount > remainingAmount) {
 							const convertedAmountToOriginal = await convertIngredientAmount(
 								ingredient.name,
@@ -396,7 +395,7 @@ const RecipeDetails = ({ route, navigation }) => {
 								ingredient.amount.metric.unit,
 								convertedAmount - remainingAmount
 							);
-							pantryItem.quantity = convertedAmountToOriginal;
+							pantryItem.quantity = convertedAmountToOriginal.toString();
 							remainingAmount = 0;
 						} else {
 							remainingAmount -= convertedAmount;
@@ -433,6 +432,7 @@ const RecipeDetails = ({ route, navigation }) => {
 					} else {
 						if (pantryItem.quantity > remainingAmount) {
 							pantryItem.quantity -= remainingAmount;
+							pantryItem.quantity = pantryItem.quantity.toString();
 							remainingAmount = 0;
 						} else {
 							remainingAmount -= pantryItem.quantity;

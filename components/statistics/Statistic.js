@@ -143,6 +143,13 @@ const Statistic = () => {
 					</View>
 					<View style={styles.statisticItem}>
 						<View style={styles.iconAndLabelContainer}>
+							<MaterialIcons name="warning" size={30} color={COLORS.warning} />
+							<Text style={styles.label}>Total Expiring Products:</Text>
+						</View>
+						<Text style={styles.value}>{userData.expiringProducts}</Text>
+					</View>
+					<View style={styles.statisticItem}>
+						<View style={styles.iconAndLabelContainer}>
 							<MaterialIcons name="eco" size={30} color={COLORS.primary} />
 							<Text style={styles.label}>Total Consumed Products:</Text>
 						</View>
@@ -154,13 +161,6 @@ const Statistic = () => {
 							<Text style={styles.label}>Total Expired Products:</Text>
 						</View>
 						<Text style={styles.value}>{userData.expiredProducts}</Text>
-					</View>
-					<View style={styles.statisticItem}>
-						<View style={styles.iconAndLabelContainer}>
-							<MaterialIcons name="warning" size={30} color={COLORS.warning} />
-							<Text style={styles.label}>Total Expiring Products:</Text>
-						</View>
-						<Text style={styles.value}>{userData.expiringProducts}</Text>
 					</View>
 					<View style={styles.statisticItem}>
 						<View style={styles.iconAndLabelContainer}>
@@ -187,7 +187,7 @@ const Statistic = () => {
 					<View style={[styles.topThreeItemContainer, styles.topThreeContainer]}>
 						<View style={styles.iconAndLabelContainerTop3}>
 							<MaterialIcons name="leaderboard" size={30} color={COLORS.secondary} />
-							<Text style={styles.label}>Top 3 Most Consumed Products:</Text>
+							<Text style={styles.label}>Top 3 Most Popular Recipes:</Text>
 						</View>
 						{topFavoriteRecipes.map((recipe, index) => (
 							<View style={styles.topThreeItem} key={index}>

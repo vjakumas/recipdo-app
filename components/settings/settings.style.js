@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
 	},
 	input: {
 		flex: 1,
-		marginLeft: SIZES.medium,
+		marginLeft: SIZES.xSmall,
 		fontFamily: FONT.regular,
 		fontSize: SIZES.medium,
 		height: "100%",
@@ -85,7 +85,8 @@ const styles = StyleSheet.create({
 		color: COLORS.white,
 	},
 	primaryButton: {
-		width: "100%",
+		marginLeft: 10,
+		width: "95%",
 		height: 65,
 		backgroundColor: COLORS.darkGray,
 		borderRadius: SIZES.medium,
