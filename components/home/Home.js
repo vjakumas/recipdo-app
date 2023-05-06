@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Image, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Image, ActivityIndicator, RefreshControl } from "react-native";
 import firebase, { firestore } from "../../config/firebase/config";
 import styles from "./home.style";
 import { COLORS, FONTS, SIZES } from "../../constants/theme";
@@ -13,10 +13,10 @@ import Constants from "expo-constants";
 
 const Home = ({ navigation }) => {
 	const [userData, setUserData] = useState("");
-	const [profileImage, setProfileImage] = useState(require("../../assets/images/user.png"));
 	const [recommendedRecipes, setRecommendedRecipes] = useState([]);
 	const [saveTheFoodRecipes, setSaveTheFoodRecipes] = useState([]);
 	const [makeItAgainRecipes, setMakeItAgainRecipes] = useState([]);
+	const [refreshing, setRefreshing] = useState(false);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -28,7 +28,6 @@ const Home = ({ navigation }) => {
 			.then((snapshot) => {
 				if (snapshot.exists) {
 					setUserData(snapshot.data());
-					setProfileImage({ uri: snapshot.data().profileImageUrl });
 				} else {
 					console.log("User does not exist");
 				}
@@ -43,6 +42,14 @@ const Home = ({ navigation }) => {
 			setLoading(false);
 		});
 	}, []);
+
+	const handleRefresh = async () => {
+		setRefreshing(true);
+		Promise.all([/*fetchRecommendedRecipes(),*/ fetchSaveTheFoodRecipes() /*fetchMakeItAgainRecipes()*/]).then(() => {
+			setLoading(false);
+		});
+		setRefreshing(false);
+	};
 
 	const fetchRecommendedRecipes = async () => {
 		const recipes = await getRecommendedRecipes();
@@ -390,7 +397,9 @@ const Home = ({ navigation }) => {
 					<ActivityIndicator size="large" color={COLORS.primary} />
 				</View>
 			) : (
-				<ScrollView showsVerticalScrollIndicator={false}>
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={COLORS.primary} />}>
 					<View style={styles.recipesContainer}>
 						<View style={styles.categorySectionSaveTheFood}>
 							<View style={styles.categoryHeaderSaveTheFood}>

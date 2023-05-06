@@ -127,7 +127,7 @@ const SavedRecipes = () => {
 						keyExtractor={(item) => item.id.toString()}
 						showsVerticalScrollIndicator={false}
 						contentContainerStyle={{ paddingBottom: SIZES.medium }}
-						refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+						refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={COLORS.primary} />}
 					/>
 				) : (
 					<View style={styles.noProductsContainer}>

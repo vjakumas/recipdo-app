@@ -56,6 +56,7 @@ const Search = () => {
 	const [searchType, setSearchType] = useState("Name");
 	const [loading, setLoading] = useState(false);
 	const [currentSearchText, setCurrentSearchText] = useState("");
+	const [searchPerformed, setSearchPerformed] = useState(false);
 	const navigation = useNavigation();
 	const route = useRoute();
 
@@ -83,6 +84,7 @@ const Search = () => {
 			return;
 		}
 
+		setSearchPerformed(true);
 		setLoading(true);
 
 		let url = "";
@@ -154,6 +156,7 @@ const Search = () => {
 			return;
 		}
 
+		setSearchPerformed(true);
 		setLoading(true);
 
 		let url = "";
@@ -271,7 +274,13 @@ const Search = () => {
 					<ActivityIndicator size="large" style={{ marginTop: 225 }} color={COLORS.primary} />
 				) : (
 					<>
-						{searchResultsData.length === 0 && (
+						{searchResultsData.length === 0 && searchPerformed && (
+							<View style={styles.noResultsContainer}>
+								<Text style={styles.noResultsLabel}>No results found.</Text>
+								<Text style={styles.noResultsSublabel}>Try something different</Text>
+							</View>
+						)}
+						{searchResultsData.length === 0 && !searchPerformed && (
 							<View style={styles.noResultsContainer}>
 								<Text style={styles.noResultsLabel}>Let's Get Cooking!</Text>
 								<Text style={styles.noResultsSublabel}>Find delicious recipes for any occasion</Text>
