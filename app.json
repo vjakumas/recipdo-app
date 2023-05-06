@@ -12,7 +12,8 @@
 			"backgroundColor": "#ffffff"
 		},
 		"extra": {
-			"spoonacularApiKey": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96"
+			"spoonacularApiKey": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+			"unsplashApiKey": "I4A2EsyfZ12pF3bZJ9805DAMTtFZFOOV9a6t8VZFKMo"
 		},
 		"assetBundlePatterns": ["**/*"],
 		"ios": {

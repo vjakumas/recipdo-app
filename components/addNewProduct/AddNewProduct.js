@@ -20,6 +20,7 @@ import firebase, { firestore } from "../../config/firebase/config";
 import Toast from "react-native-toast-message";
 import { COLORS } from "../../constants";
 import axios from "axios";
+import Constants from "expo-constants";
 
 const AddNewProduct = () => {
 	const [quantity, setQuantity] = useState("");
@@ -112,17 +113,20 @@ const AddNewProduct = () => {
 
 	const fetchProductImage = async (name) => {
 		try {
-			const response = await axios.get(`https://world.openfoodfacts.org/cgi/search.pl`, {
+			console.log("Client-ID " + Constants.manifest.extra.unsplashApiKey);
+			const response = await axios.get("https://api.unsplash.com/search/photos", {
+				headers: {
+					Authorization: "Client-ID " + Constants.manifest.extra.unsplashApiKey,
+				},
 				params: {
-					search_terms: name,
-					search_simple: 1,
-					action: "process",
-					json: 1,
+					query: name,
+					per_page: 1,
 				},
 			});
 
-			if (response.data && response.data.products && response.data.products.length > 0) {
-				return response.data.products[0].image_url;
+			if (response.data && response.data.results && response.data.results.length > 0) {
+				console.log(response.data.results[0].urls.regular);
+				return response.data.results[0].urls.regular;
 			}
 		} catch (error) {
 			console.error("Error fetching product image:", error);
@@ -166,7 +170,7 @@ const AddNewProduct = () => {
 				number: "1",
 			},
 			headers: {
-				"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+				"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 			},
 		});
@@ -181,7 +185,7 @@ const AddNewProduct = () => {
 				unit: "grams",
 			},
 			headers: {
-				"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+				"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 			},
 		};
@@ -213,7 +217,7 @@ const AddNewProduct = () => {
 				},
 				headers: {
 					"content-type": "application/octet-stream",
-					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 				},
 			};

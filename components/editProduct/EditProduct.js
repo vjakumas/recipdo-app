@@ -115,17 +115,19 @@ const EditProduct = ({ route }) => {
 
 	const fetchProductImage = async (name) => {
 		try {
-			const response = await axios.get(`https://world.openfoodfacts.org/cgi/search.pl`, {
+			const response = await axios.get("https://api.unsplash.com/search/photos", {
+				headers: {
+					Authorization: "Client-ID I4A2EsyfZ12pF3bZJ9805DAMTtFZFOOV9a6t8VZFKMo",
+				},
 				params: {
-					search_terms: name,
-					search_simple: 1,
-					action: "process",
-					json: 1,
+					query: name,
+					per_page: 1,
 				},
 			});
 
-			if (response.data && response.data.products && response.data.products.length > 0) {
-				return response.data.products[0].image_url;
+			if (response.data && response.data.results && response.data.results.length > 0) {
+				console.log(response.data.results[0].urls.regular);
+				return response.data.results[0].urls.regular;
 			}
 		} catch (error) {
 			console.error("Error fetching product image:", error);
