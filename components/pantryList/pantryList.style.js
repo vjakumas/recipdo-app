@@ -68,6 +68,11 @@ const styles = StyleSheet.create({
 		left: SIZES.medium + 10,
 		zIndex: 10,
 	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
 });
 
 export default styles;

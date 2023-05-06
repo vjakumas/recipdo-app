@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, TextInput, SafeAreaView, Image, TouchableOpacity, Text } from "react-native";
+import { View, TextInput, SafeAreaView, Image, TouchableOpacity, Text, ActivityIndicator } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./pantryList.style";
 import { COLORS } from "../../constants";
@@ -16,6 +16,7 @@ const PantryList = () => {
 	const [remainingProducts, setRemainingProducts] = useState([]);
 	const [expiringSoonProducts, setExpiringSoonProducts] = useState([]);
 	const [filteredProducts, setFilteredProducts] = useState([]);
+	const [productsLoading, setProductsLoading] = useState(true);
 	const navigation = useNavigation();
 	useEffect(() => {
 		const user = firebase.auth().currentUser;
@@ -39,6 +40,8 @@ const PantryList = () => {
 					setAllProducts(pantryItems);
 
 					await updateExpiringProducts(expiringSoon.length);
+
+					setProductsLoading(false);
 				});
 
 			return () => {
@@ -95,7 +98,12 @@ const PantryList = () => {
 					/>
 				</View>
 			)}
-			{expiringSoonProducts.length === 0 && remainingProducts.length === 0 ? (
+
+			{productsLoading ? (
+				<View style={styles.loadingContainer}>
+					<ActivityIndicator size="large" color={COLORS.primary} />
+				</View>
+			) : expiringSoonProducts.length === 0 && remainingProducts.length === 0 ? (
 				<View style={styles.noProductsContainer}>
 					<Text style={styles.noProductsHeader}>Your pantry is waiting to be filled!</Text>
 					<Text style={styles.noProductsTitle}>The possibilities are endless with a full pantry.</Text>

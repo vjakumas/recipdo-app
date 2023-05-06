@@ -1,10 +1,32 @@
-import React, { useState, forwardRef, useImperativeHandle } from "react";
+import React, { useState, forwardRef, useEffect, useRef, useImperativeHandle } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { COLORS, FONT, SIZES, SHADOWS } from "../../../../constants";
 import Modal from "react-native-modal";
+import firebase, { firestore } from "../../../../config/firebase/config";
 import Icon from "react-native-vector-icons/Ionicons"; // Import the Icon component
 
 const ProfileDropdown = forwardRef(({ handleSettings, handleLogout, handleStatistics }, ref) => {
 	const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+	const [profileImage, setProfileImage] = useState(require("../../../../assets/images/menu.png"));
+	const [name, setName] = useState("");
+	const user = firebase.auth().currentUser;
+	const usersRef = firebase.firestore().collection("users");
+
+	useEffect(() => {
+		if (user) {
+			const unsubscribe = usersRef.doc(user.uid).onSnapshot((snapshot) => {
+				if (snapshot.exists) {
+					setName(snapshot.data().name);
+				} else {
+					console.log("User does not exist");
+				}
+			});
+
+			return () => {
+				unsubscribe();
+			};
+		}
+	}, []);
 
 	const toggleDropdown = () => {
 		setIsDropdownVisible(!isDropdownVisible);
@@ -17,10 +39,13 @@ const ProfileDropdown = forwardRef(({ handleSettings, handleLogout, handleStatis
 	return (
 		<View>
 			<TouchableOpacity onPress={toggleDropdown}>
-				<Image source={require("../../../../assets/images/user.png")} style={styles.profilePicture} />
+				<Image source={require("../../../../assets/images/menu.png")} style={styles.profilePicture} />
 			</TouchableOpacity>
 			<Modal isVisible={isDropdownVisible} onBackdropPress={toggleDropdown} style={styles.modal}>
 				<View style={styles.dropdown}>
+					<View style={styles.dropdownItem}>
+						<Text style={styles.dropdownProfileName}>{name}</Text>
+					</View>
 					<TouchableOpacity style={styles.dropdownItem} onPress={handleSettings}>
 						<Icon name="settings-outline" size={24} color="black" />
 						<Text style={styles.dropdownItemText}>Settings</Text>
@@ -41,9 +66,8 @@ const ProfileDropdown = forwardRef(({ handleSettings, handleLogout, handleStatis
 
 const styles = StyleSheet.create({
 	profilePicture: {
-		width: 40,
-		height: 40,
-		borderRadius: 20,
+		width: 30,
+		height: 30,
 	},
 	modal: {
 		margin: 0,
@@ -51,7 +75,7 @@ const styles = StyleSheet.create({
 	dropdown: {
 		backgroundColor: "white",
 		borderRadius: 10,
-		paddingHorizontal: 24, // Increase the padding for wider buttons
+		paddingHorizontal: 24,
 		paddingVertical: 8,
 		position: "absolute",
 		right: 16,
@@ -59,14 +83,20 @@ const styles = StyleSheet.create({
 		elevation: 5,
 	},
 	dropdownItem: {
-		flexDirection: "row", // Change the layout to a row
-		alignItems: "center", // Align the items to the center
+		flexDirection: "row",
+		alignItems: "center",
 		paddingVertical: 12,
+	},
+	dropdownProfileName: {
+		fontSize: 18,
+		color: COLORS.primary,
+		fontFamily: FONT.bold,
+		marginLeft: 16,
 	},
 	dropdownItemText: {
 		fontSize: 18,
 		color: "black",
-		marginLeft: 16, // Add some margin between the icon and the text
+		marginLeft: 16,
 	},
 	logoutText: {
 		fontWeight: "bold",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Image } from "react-native";
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Image, ActivityIndicator } from "react-native";
 import firebase, { firestore } from "../../config/firebase/config";
 import styles from "./home.style";
 import { COLORS, FONTS, SIZES } from "../../constants/theme";
@@ -12,10 +12,12 @@ import axios from "axios";
 import Constants from "expo-constants";
 
 const Home = ({ navigation }) => {
-	const [name, setName] = useState("");
+	const [userData, setUserData] = useState("");
+	const [profileImage, setProfileImage] = useState(require("../../assets/images/user.png"));
 	const [recommendedRecipes, setRecommendedRecipes] = useState([]);
 	const [saveTheFoodRecipes, setSaveTheFoodRecipes] = useState([]);
 	const [makeItAgainRecipes, setMakeItAgainRecipes] = useState([]);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		firebase
@@ -25,15 +27,21 @@ const Home = ({ navigation }) => {
 			.get()
 			.then((snapshot) => {
 				if (snapshot.exists) {
-					setName(snapshot.data());
+					setUserData(snapshot.data());
+					setProfileImage({ uri: snapshot.data().profileImageUrl });
 				} else {
 					console.log("User does not exist");
 				}
 			});
 		updateExpiringItems();
-		// fetchRecommendedRecipes(); // UNCOMMENT/COMMENT THIS ONE TO DISPLAY RECOMMENDED RECIPES
-		// fetchSaveTheFoodRecipes(); // UNCOMMENT/COMMENT THIS ONE TO DISPLAY SAVE-THE-FOOD RECIPES
-		// fetchMakeItAgainRecipes(); // UNCOMMENT/COMMENT THIS ONE TO DISPLAY MAKE-IT-AGAIN RECIPES
+
+		// COMMENT/UNCOMMENT THIS LINE TO FETCH RECIPES
+		// setLoading(false);
+
+		// UNCOMMENT/COMMENT THIS CODE TO FETCH RECIPES
+		Promise.all([fetchRecommendedRecipes(), fetchSaveTheFoodRecipes(), fetchMakeItAgainRecipes()]).then(() => {
+			setLoading(false);
+		});
 	}, []);
 
 	const fetchRecommendedRecipes = async () => {
@@ -70,7 +78,6 @@ const Home = ({ navigation }) => {
 
 			const updatedPantryItems = pantryItems.map((item) => {
 				const itemDate = item.date.toDate();
-				console.log(itemDate);
 				if (itemDate > today && itemDate <= fiveDaysLater && !item.isExpiringSoon) {
 					return { ...item, isExpiringSoon: true };
 				}
@@ -98,7 +105,6 @@ const Home = ({ navigation }) => {
 
 		const nonExpiredPantryItems = pantryItems.filter((item) => {
 			const itemDate = item.date.toDate();
-			console.log(item.name + "   " + item.date.toDate() + "   " + today);
 			if (itemDate < today) {
 				expiredProductsCount++;
 				return false;
@@ -137,10 +143,14 @@ const Home = ({ navigation }) => {
 		try {
 			const userId = firebase.auth().currentUser.uid;
 			const userDoc = await firestore.collection("users").doc(userId).get();
-			const finishedRecipeIds = userDoc.data().finishedRecipes || [];
+			const finishedRecipes = userDoc.data().finishedRecipes || [];
 
-			if (finishedRecipeIds.length > 0) {
-				const recipes = await getRecipeInformationBulk(finishedRecipeIds);
+			if (finishedRecipes.length > 0) {
+				const recipeIds = finishedRecipes.map((recipe) => recipe.id);
+				const uniqueRecipeIds = new Set(recipeIds);
+				const uniqueFinishedRecipeIds = Array.from(uniqueRecipeIds);
+
+				const recipes = await getRecipeInformationBulk(uniqueFinishedRecipeIds);
 				setMakeItAgainRecipes(recipes);
 			}
 		} catch (error) {
@@ -316,16 +326,26 @@ const Home = ({ navigation }) => {
 		const savedRecipes = userDoc.data().savedRecipes;
 		const finishedRecipes = userDoc.data().finishedRecipes;
 
+		const uniqueRecipeIds = new Set();
+
+		// Iterate over the finishedRecipes array
+		for (let recipe of finishedRecipes) {
+			// Add the recipe ID to the uniqueRecipeIds Set
+			uniqueRecipeIds.add(recipe.id);
+		}
+		// Convert the Set back to an array
+		const uniqueFinishedRecipes = Array.from(uniqueRecipeIds);
+
 		let recipeIds = [];
 
-		if (finishedRecipes.length >= 5) {
-			// Get 2 similar recipes for each of the first 5 finished recipes
+		if (uniqueFinishedRecipes.length >= 5) {
+			console.log("Pirmas" + uniqueFinishedRecipes);
+
 			for (let i = 0; i < 5; i++) {
-				const similarRecipesRes = await getSimilarRecipes(finishedRecipes[i], 2);
+				const similarRecipesRes = await getSimilarRecipes(uniqueFinishedRecipes[i], 2);
 				recipeIds = recipeIds.concat(similarRecipesRes);
 			}
-		} else if (finishedRecipes.length > 0) {
-			// Get similar recipes based on the finished and saved recipes according to the specified distribution
+		} else if (uniqueFinishedRecipes.length > 0) {
 			const recipeDistribution = [
 				[10], // 1 finished recipe
 				[5, 5], // 2 finished recipes
@@ -333,14 +353,14 @@ const Home = ({ navigation }) => {
 				[2, 3, 2, 3], // 4 finished recipes
 			];
 
-			const distribution = recipeDistribution[finishedRecipes.length - 1];
+			const distribution = recipeDistribution[uniqueFinishedRecipes.length - 1];
 
-			for (let i = 0; i < finishedRecipes.length; i++) {
-				const similarRecipesRes = await getSimilarRecipes(finishedRecipes[i], distribution[i]);
+			for (let i = 0; i < uniqueFinishedRecipes.length; i++) {
+				const similarRecipesRes = await getSimilarRecipes(uniqueFinishedRecipes[i], distribution[i]);
 				recipeIds = recipeIds.concat(similarRecipesRes);
 			}
 		} else {
-			// Display 10 random recipes
+			console.log("TRECIAS" + uniqueFinishedRecipes);
 			const randomRecipesRes = await getRandomRecipes(10);
 			recipeIds = randomRecipesRes;
 		}
@@ -365,39 +385,45 @@ const Home = ({ navigation }) => {
 					/>
 				</View>
 			</View>
-			<ScrollView showsVerticalScrollIndicator={false}>
-				<View style={styles.recipesContainer}>
-					<View style={styles.categorySection}>
-						<View style={styles.categoryHeader}>
-							<Text style={styles.categoryTitle}>Recommended for you</Text>
-							<TouchableOpacity style={styles.seeAllButton}>
-								<Text style={styles.seeAllText}>See all</Text>
-							</TouchableOpacity>
-						</View>
-						<RecipeCardMediumList recipes={recommendedRecipes} navigation={navigation} />
-					</View>
-
-					<View style={styles.categorySection}>
-						<View style={styles.categoryHeader}>
-							<Text style={styles.categoryTitle}>Save-the-food recipes</Text>
-							<TouchableOpacity style={styles.seeAllButton}>
-								<Text style={styles.seeAllText}>See all</Text>
-							</TouchableOpacity>
-						</View>
-						<RecipeCardMediumSafeFoodList recipes={saveTheFoodRecipes} navigation={navigation} />
-					</View>
-
-					<View style={styles.categorySection}>
-						<View style={styles.categoryHeader}>
-							<Text style={styles.categoryTitle}>Make it again</Text>
-							<TouchableOpacity style={styles.seeAllButton}>
-								<Text style={styles.seeAllText}>See all</Text>
-							</TouchableOpacity>
-						</View>
-						<RecipeCardMediumList recipes={makeItAgainRecipes} navigation={navigation} />
-					</View>
+			{loading ? (
+				<View style={styles.loadingContainer}>
+					<ActivityIndicator size="large" color={COLORS.primary} />
 				</View>
-			</ScrollView>
+			) : (
+				<ScrollView showsVerticalScrollIndicator={false}>
+					<View style={styles.recipesContainer}>
+						<View style={styles.categorySection}>
+							<View style={styles.categoryHeader}>
+								<Text style={styles.categoryTitle}>Recommended for you</Text>
+								{/* <TouchableOpacity style={styles.seeAllButton}>
+									<Text style={styles.seeAllText}>See all</Text>
+								</TouchableOpacity> */}
+							</View>
+							<RecipeCardMediumList recipes={recommendedRecipes} navigation={navigation} />
+						</View>
+
+						<View style={styles.categorySection}>
+							<View style={styles.categoryHeader}>
+								<Text style={styles.categoryTitle}>Save-the-food recipes</Text>
+								{/* <TouchableOpacity style={styles.seeAllButton}>
+									<Text style={styles.seeAllText}>See all</Text>
+								</TouchableOpacity> */}
+							</View>
+							<RecipeCardMediumSafeFoodList recipes={saveTheFoodRecipes} navigation={navigation} />
+						</View>
+
+						<View style={styles.categorySection}>
+							<View style={styles.categoryHeader}>
+								<Text style={styles.categoryTitle}>Make it again</Text>
+								{/* <TouchableOpacity style={styles.seeAllButton}>
+									<Text style={styles.seeAllText}>See all</Text>
+								</TouchableOpacity> */}
+							</View>
+							<RecipeCardMediumList recipes={makeItAgainRecipes} navigation={navigation} />
+						</View>
+					</View>
+				</ScrollView>
+			)}
 		</SafeAreaView>
 	);
 };

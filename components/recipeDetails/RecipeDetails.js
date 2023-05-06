@@ -1,5 +1,16 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, View, Text, Image, Modal, TouchableWithoutFeedback } from "react-native";
+import {
+	SafeAreaView,
+	ScrollView,
+	ActivityIndicator,
+	TouchableOpacity,
+	View,
+	Text,
+	Image,
+	Modal,
+	TouchableWithoutFeedback,
+	Alert,
+} from "react-native";
 
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
@@ -25,6 +36,7 @@ const RecipeDetails = ({ route, navigation }) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [selectedSteps, setSelectedSteps] = useState([]);
 	const [modalVisible, setModalVisible] = useState(false);
+	const [modalLoading, setModalLoading] = useState(false);
 
 	useEffect(() => {
 		if ("missedIngredientCount" in route.params.recipe) {
@@ -277,6 +289,7 @@ const RecipeDetails = ({ route, navigation }) => {
 	};
 
 	const finishRecipe = async (recipe) => {
+		setModalLoading(true);
 		const userId = firebase.auth().currentUser.uid;
 		const userRef = firestore.collection("users").doc(userId);
 
@@ -318,7 +331,9 @@ const RecipeDetails = ({ route, navigation }) => {
 			hideModal();
 		} catch (error) {
 			console.error("Error marking recipe as finished:", error);
+			setModalLoading(false);
 		}
+		setModalLoading(false);
 	};
 
 	const renderIngredients = () => {
@@ -512,97 +527,105 @@ const RecipeDetails = ({ route, navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<Modal animationType="fade" transparent={true} visible={modalVisible}>
-				<TouchableWithoutFeedback onPress={hideModal}>
-					<View style={styles.modalOverlay}>
-						<View style={styles.modalContainer}>
-							<Text style={styles.modalTitle}>Finish Recipe</Text>
-							<Text style={styles.modalText}>Are you sure you want to finish this recipe and subtract the ingredients?</Text>
-							<View style={styles.modalButtonsContainer}>
-								<TouchableOpacity style={styles.modalCancelButton} onPress={hideModal}>
-									<Text style={styles.modalCancelButtonText}>Cancel</Text>
-								</TouchableOpacity>
-								<TouchableOpacity style={styles.modalConfirmButton} onPress={() => finishRecipe(recipe)}>
-									<Text style={styles.modalConfirmButtonText}>Confirm</Text>
-								</TouchableOpacity>
-							</View>
-						</View>
-					</View>
-				</TouchableWithoutFeedback>
-			</Modal>
-			{isLoading ? (
-				<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+			{modalLoading ? (
+				<View style={styles.loadingContainer}>
 					<ActivityIndicator size="large" color={COLORS.primary} />
 				</View>
 			) : (
-				<ScrollView showsVerticalScrollIndicator={false}>
-					<View>
-						<Image style={styles.image} source={{ uri: image }} />
-						<View style={styles.dishTypeContainer}>
-							<Text style={styles.dishType}>{dishType ? dishType.charAt(0).toUpperCase() + dishType.slice(1) : ""}</Text>
-						</View>
-						<View style={styles.readyInMinutesContainer}>
-							<Text style={styles.readyInMinutes}>
-								<MaterialIcons name="timer" size={16} color="white" /> {readyInMinutes} min
-							</Text>
-						</View>
-					</View>
-					<View style={styles.container}>
-						<View style={styles.header}>
-							<Text style={styles.title}>{title}</Text>
-							<TouchableOpacity style={styles.saveRecipeButton} onPress={toggleSaveRecipe}>
-								{isSaved ? (
-									<MaterialIcons name="favorite" size={24} color="red" />
-								) : (
-									<MaterialIcons name="favorite-border" size={24} color="red" />
-								)}
-							</TouchableOpacity>
-						</View>
-						<Text style={styles.servings}>{servings} servings</Text>
-						{nutritionData && (
-							<View style={styles.nutritionContainer}>
-								<Text style={styles.nutritionTitle}>Nutrition Facts</Text>
-								<View style={styles.nutritionRow}>
-									<View style={styles.nutritionItem}>
-										<View style={styles.nutritionIcon}>
-											<MaterialIcons name="local-fire-department" size={24} color={COLORS.darkGray} />
-										</View>
-										<Text style={styles.nutritionText}>{nutritionData.calories} Kcal</Text>
-									</View>
-									<View style={styles.nutritionItem}>
-										<View style={styles.nutritionIcon}>
-											<MaterialIcons name="free-breakfast" size={24} color={COLORS.darkGray} />
-										</View>
-										<Text style={styles.nutritionText}>{nutritionData.carbs} carbs</Text>
-									</View>
-								</View>
-								<View style={styles.nutritionRow}>
-									<View style={styles.nutritionItem}>
-										<View style={styles.nutritionIcon}>
-											<MaterialIcons name="fitness-center" size={24} color={COLORS.darkGray} />
-										</View>
-										<Text style={styles.nutritionText}>{nutritionData.protein} protein</Text>
-									</View>
-									<View style={styles.nutritionItem}>
-										<View style={styles.nutritionIcon}>
-											<MaterialIcons name="fastfood" size={24} color={COLORS.darkGray} />
-										</View>
-										<Text style={styles.nutritionText}>{nutritionData.fat} fat</Text>
+				<>
+					<Modal animationType="fade" transparent={true} visible={modalVisible}>
+						<TouchableWithoutFeedback onPress={hideModal}>
+							<View style={styles.modalOverlay}>
+								<View style={styles.modalContainer}>
+									<Text style={styles.modalTitle}>Finish Recipe</Text>
+									<Text style={styles.modalText}>Are you sure you want to finish this recipe and subtract the ingredients?</Text>
+									<View style={styles.modalButtonsContainer}>
+										<TouchableOpacity style={styles.modalCancelButton} onPress={hideModal}>
+											<Text style={styles.modalCancelButtonText}>Cancel</Text>
+										</TouchableOpacity>
+										<TouchableOpacity style={styles.modalConfirmButton} onPress={() => finishRecipe(recipe)}>
+											<Text style={styles.modalConfirmButtonText}>Confirm</Text>
+										</TouchableOpacity>
 									</View>
 								</View>
 							</View>
-						)}
-						<View style={styles.ingredientsContainer}>
-							<Text style={styles.ingredientsTitle}>Ingredients</Text>
-							{renderIngredients()}
+						</TouchableWithoutFeedback>
+					</Modal>
+					{isLoading ? (
+						<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+							<ActivityIndicator size="large" color={COLORS.primary} />
 						</View>
-						<Text style={styles.instructionsTitle}>Instructions</Text>
-						{renderInstructions()}
-						<TouchableOpacity style={styles.submitButton} onPress={showModal}>
-							<Text style={styles.submitButtonText}>Finish recipe</Text>
-						</TouchableOpacity>
-					</View>
-				</ScrollView>
+					) : (
+						<ScrollView showsVerticalScrollIndicator={false}>
+							<View>
+								<Image style={styles.image} source={{ uri: image }} />
+								<View style={styles.dishTypeContainer}>
+									<Text style={styles.dishType}>{dishType ? dishType.charAt(0).toUpperCase() + dishType.slice(1) : ""}</Text>
+								</View>
+								<View style={styles.readyInMinutesContainer}>
+									<Text style={styles.readyInMinutes}>
+										<MaterialIcons name="timer" size={16} color="white" /> {readyInMinutes} min
+									</Text>
+								</View>
+							</View>
+							<View style={styles.container}>
+								<View style={styles.header}>
+									<Text style={styles.title}>{title}</Text>
+									<TouchableOpacity style={styles.saveRecipeButton} onPress={toggleSaveRecipe}>
+										{isSaved ? (
+											<MaterialIcons name="favorite" size={24} color="red" />
+										) : (
+											<MaterialIcons name="favorite-border" size={24} color="red" />
+										)}
+									</TouchableOpacity>
+								</View>
+								<Text style={styles.servings}>{servings} servings</Text>
+								{nutritionData && (
+									<View style={styles.nutritionContainer}>
+										<Text style={styles.nutritionTitle}>Nutrition Facts</Text>
+										<View style={styles.nutritionRow}>
+											<View style={styles.nutritionItem}>
+												<View style={styles.nutritionIcon}>
+													<MaterialIcons name="local-fire-department" size={24} color={COLORS.darkGray} />
+												</View>
+												<Text style={styles.nutritionText}>{nutritionData.calories} Kcal</Text>
+											</View>
+											<View style={styles.nutritionItem}>
+												<View style={styles.nutritionIcon}>
+													<MaterialIcons name="free-breakfast" size={24} color={COLORS.darkGray} />
+												</View>
+												<Text style={styles.nutritionText}>{nutritionData.carbs} carbs</Text>
+											</View>
+										</View>
+										<View style={styles.nutritionRow}>
+											<View style={styles.nutritionItem}>
+												<View style={styles.nutritionIcon}>
+													<MaterialIcons name="fitness-center" size={24} color={COLORS.darkGray} />
+												</View>
+												<Text style={styles.nutritionText}>{nutritionData.protein} protein</Text>
+											</View>
+											<View style={styles.nutritionItem}>
+												<View style={styles.nutritionIcon}>
+													<MaterialIcons name="fastfood" size={24} color={COLORS.darkGray} />
+												</View>
+												<Text style={styles.nutritionText}>{nutritionData.fat} fat</Text>
+											</View>
+										</View>
+									</View>
+								)}
+								<View style={styles.ingredientsContainer}>
+									<Text style={styles.ingredientsTitle}>Ingredients</Text>
+									{renderIngredients()}
+								</View>
+								<Text style={styles.instructionsTitle}>Instructions</Text>
+								{renderInstructions()}
+								<TouchableOpacity style={styles.submitButton} onPress={showModal}>
+									<Text style={styles.submitButtonText}>Finish recipe</Text>
+								</TouchableOpacity>
+							</View>
+						</ScrollView>
+					)}
+				</>
 			)}
 		</SafeAreaView>
 	);

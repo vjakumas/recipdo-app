@@ -19,7 +19,7 @@ const AddProduct = ({ navigation }) => {
 						<Text style={styles.primaryButtonText}>Add new product</Text>
 					</View>
 				</TouchableOpacity>
-				<View style={styles.separatorContainer}>
+				{/* <View style={styles.separatorContainer}>
 					<View style={styles.line} />
 					<Text style={styles.separatorText}>Or continue with</Text>
 					<View style={styles.line} />
@@ -35,7 +35,7 @@ const AddProduct = ({ navigation }) => {
 						<Icon name="barcode" size={24} style={{ marginRight: 10, color: COLORS.darkGray }} />
 						<Text style={styles.secondaryButtonText}>Scan a barcode</Text>
 					</View>
-				</TouchableOpacity>
+				</TouchableOpacity> */}
 			</View>
 		</View>
 	);

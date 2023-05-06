@@ -89,6 +89,11 @@ const styles = StyleSheet.create({
 		color: COLORS.primary,
 		fontWeight: "bold",
 	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
 });
 
 export default styles;
