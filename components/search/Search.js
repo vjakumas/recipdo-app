@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react"; // Add useCallback import
 import {
 	View,
 	Text,
@@ -11,12 +11,13 @@ import {
 	TouchableWithoutFeedback,
 	Keyboard,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "./search.styles";
 import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
 import axios from "axios";
 import { LinearGradient } from "expo-linear-gradient";
+import Constants from "expo-constants";
 
 const RecipeCard = ({ recipe, onPress }) => {
 	return (
@@ -54,7 +55,98 @@ const Search = () => {
 	const [searchResultsData, setSearchResultsData] = useState([]);
 	const [searchType, setSearchType] = useState("Name");
 	const [loading, setLoading] = useState(false);
+	const [currentSearchText, setCurrentSearchText] = useState("");
 	const navigation = useNavigation();
+	const route = useRoute();
+
+	useEffect(() => {
+		if (route.params?.ingredient) {
+			setSearchText(route.params.ingredient);
+			setSearchType("Ingredients");
+			setCurrentSearchText(route.params.ingredient);
+		}
+	}, [route]);
+
+	useEffect(() => {
+		if (searchText) {
+			handleSearchFromProduct();
+		}
+	}, [searchText, handleSearchFromProduct]);
+
+	const handleSearchFromProduct = useCallback(async () => {
+		if (!currentSearchText) {
+			setSearchResultsId([]);
+			return;
+		}
+		if (!searchText) {
+			setSearchResultsId([]);
+			return;
+		}
+
+		setLoading(true);
+
+		let url = "";
+		let options = {};
+		if (searchType === "Name") {
+			url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/search";
+			options = {
+				method: "GET",
+				url: url,
+				params: {
+					query: searchText,
+					number: "10",
+				},
+				headers: {
+					"content-type": "application/octet-stream",
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
+					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+				},
+			};
+		} else {
+			url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients";
+			options = {
+				method: "GET",
+				url: url,
+				params: {
+					ingredients: searchText,
+					number: "10",
+				},
+				headers: {
+					"content-type": "application/octet-stream",
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
+					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+				},
+			};
+		}
+
+		try {
+			const searchResponse = await axios.request(options);
+
+			const recipeIds = (searchResponse.data.results || searchResponse.data).map((recipe) => recipe.id).join(",");
+
+			const recipeInfoOptions = {
+				method: "GET",
+				url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk",
+				params: { ids: recipeIds },
+				headers: {
+					"content-type": "application/octet-stream",
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
+					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+				},
+			};
+
+			const [, recipeInfoResponse] = await Promise.all([Promise.resolve(searchResponse), axios.request(recipeInfoOptions)]);
+
+			setSearchResultsId(searchResponse.data.results || searchResponse.data);
+			setSearchResultsData(recipeInfoResponse.data);
+			setLoading(false);
+		} catch (error) {
+			console.error(error);
+			setSearchResultsId([]);
+			setSearchResultsData([]);
+			setLoading(false);
+		}
+	}, [searchType, searchText]);
 
 	const handleSearch = async () => {
 		if (!searchText) {
@@ -77,7 +169,7 @@ const Search = () => {
 				},
 				headers: {
 					"content-type": "application/octet-stream",
-					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 				},
 			};
@@ -92,7 +184,7 @@ const Search = () => {
 				},
 				headers: {
 					"content-type": "application/octet-stream",
-					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 				},
 			};
@@ -109,7 +201,7 @@ const Search = () => {
 				params: { ids: recipeIds },
 				headers: {
 					"content-type": "application/octet-stream",
-					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 				},
 			};

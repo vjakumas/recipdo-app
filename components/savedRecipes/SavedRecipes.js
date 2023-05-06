@@ -7,6 +7,7 @@ import firebase, { firestore } from "../../config/firebase/config";
 import { SIZES, COLORS, FONT, SHADOWS } from "../../constants";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import Constants from "expo-constants";
 
 const SavedRecipes = () => {
 	const [recipes, setRecipes] = useState([]);
@@ -29,7 +30,7 @@ const SavedRecipes = () => {
 				params: { ids: savedRecipeIds },
 				headers: {
 					"content-type": "application/octet-stream",
-					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 				},
 			};

@@ -20,6 +20,7 @@ import firebase, { firestore } from "../../config/firebase/config";
 import Toast from "react-native-toast-message";
 import { COLORS } from "../../constants";
 import axios from "axios";
+import Constants from "expo-constants";
 
 const EditProduct = ({ route }) => {
 	const { pantryItem } = route.params;
@@ -102,7 +103,7 @@ const EditProduct = ({ route }) => {
 				},
 				headers: {
 					"content-type": "application/octet-stream",
-					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 				},
 			});
@@ -170,7 +171,7 @@ const EditProduct = ({ route }) => {
 				},
 				headers: {
 					"content-type": "application/octet-stream",
-					"X-RapidAPI-Key": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
 					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
 				},
 			};

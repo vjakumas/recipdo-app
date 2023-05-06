@@ -26,24 +26,22 @@ const Statistic = () => {
 			const userId = firebase.auth().currentUser.uid;
 			try {
 				const docRef = firebase.firestore().collection("users").doc(userId);
-				const doc = await docRef.get();
-				if (doc.exists) {
-					setUserData(doc.data());
-				} else {
-					console.log("No such document!");
-				}
+
+				const unsubscribe = docRef.onSnapshot((doc) => {
+					if (doc.exists) {
+						setUserData(doc.data());
+					} else {
+						console.log("No such document!");
+					}
+				});
+
+				return () => unsubscribe();
 			} catch (error) {
 				console.log("Error getting document:", error);
 			}
 		};
 
 		fetchData();
-
-		const timer = setTimeout(() => {
-			setIsLoading(false);
-		}, 500);
-
-		return () => clearTimeout(timer);
 	}, []);
 
 	useEffect(() => {

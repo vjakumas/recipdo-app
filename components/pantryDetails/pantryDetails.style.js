@@ -203,6 +203,39 @@ const styles = StyleSheet.create({
 		color: "white",
 		fontWeight: "bold",
 	},
+	checkboxContainer: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 15,
+	},
+	checkboxesContainer: {
+		marginBottom: 15,
+	},
+	checkbox: {
+		borderRadius: 50,
+		borderWidth: 2,
+		borderColor: COLORS.lightGray,
+		width: 30,
+		height: 30,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	checkboxSelected: {
+		backgroundColor: COLORS.primary,
+		borderWidth: 2,
+		borderColor: COLORS.primary,
+	},
+	checkboxIcon: {
+		color: "white",
+	},
+	checkboxLabel: {
+		fontFamily: FONT.medium,
+		marginLeft: 10,
+	},
+	checkboxLabelSelected: {
+		fontFamily: FONT.bold,
+		marginLeft: 10,
+	},
 });
 
 export default styles;
