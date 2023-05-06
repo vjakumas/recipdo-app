@@ -38,16 +38,17 @@ const Home = ({ navigation }) => {
 		setLoading(false);
 
 		// UNCOMMENT/COMMENT THIS CODE TO FETCH RECIPES
-		Promise.all([/*fetchRecommendedRecipes(),*/ fetchSaveTheFoodRecipes() /*fetchMakeItAgainRecipes()*/]).then(() => {
-			setLoading(false);
-		});
+		// Promise.all([fetchRecommendedRecipes(), fetchSaveTheFoodRecipes(), fetchMakeItAgainRecipes()]).then(() => {
+		// 	setLoading(false);
+		// });
 	}, []);
 
 	const handleRefresh = async () => {
 		setRefreshing(true);
-		Promise.all([/*fetchRecommendedRecipes(),*/ fetchSaveTheFoodRecipes() /*fetchMakeItAgainRecipes()*/]).then(() => {
-			setLoading(false);
-		});
+		// UNCOMMENT/COMMENT THIS CODE TO FETCH RECIPES
+		// Promise.all([fetchRecommendedRecipes(), fetchSaveTheFoodRecipes(), fetchMakeItAgainRecipes()]).then(() => {
+		// 	setLoading(false);
+		// });
 		setRefreshing(false);
 	};
 

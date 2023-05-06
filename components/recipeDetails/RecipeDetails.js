@@ -19,6 +19,7 @@ import styles from "./recipeDetails.style";
 import firebase, { firestore } from "../../config/firebase/config";
 import axios from "axios";
 import Constants from "expo-constants";
+import stringSimilarity from "string-similarity";
 
 const RecipeDetails = ({ route, navigation }) => {
 	const [recipe, setRecipe] = useState(route.params.recipe);
@@ -184,7 +185,15 @@ const RecipeDetails = ({ route, navigation }) => {
 	};
 
 	const isIngredientAvailable = async (ingredient) => {
-		const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
+		const similarityThreshold = 0.4;
+
+		const matchingPantryItems = pantryItems.filter((item) => {
+			const similarity = stringSimilarity.compareTwoStrings(item.name.toLowerCase().trim(), ingredient.name.toLowerCase().trim());
+			console.log(similarity + ":    Ingredient(recipe's): " + item.name + "    Product(user's): " + ingredient.name);
+			return similarity >= similarityThreshold;
+		});
+		console.log(`\n`);
+
 		if (matchingPantryItems.length === 0) {
 			return false;
 		}

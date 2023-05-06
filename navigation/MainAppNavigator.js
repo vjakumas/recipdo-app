@@ -14,6 +14,7 @@ import MainStackNavigator from "./MainStackNavigator";
 import AddProductStackNavigator from "./AddProductStackNavigator";
 import PantryStackNavigator from "./PantryStackNavigator";
 import SavedRecipesStackNavigator from "./SavedRecipesStackNavigator";
+import SearchStackNavigator from "./SearchStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -50,7 +51,7 @@ const MainAppNavigator = () => {
 				],
 			})}>
 			<Tab.Screen name="Main" component={MainStackNavigator} />
-			<Tab.Screen name="Search" component={Search} />
+			<Tab.Screen name="Search" component={SearchStackNavigator} />
 			<Tab.Screen name="Add Product" component={AddProductStackNavigator} />
 			<Tab.Screen name="Pantry List" component={PantryStackNavigator} />
 			<Tab.Screen name="Saved" component={SavedRecipesStackNavigator} />

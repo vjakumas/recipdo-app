@@ -36,7 +36,7 @@ const PantryDetails = ({ route }) => {
 	const daysDifference = expirationDate && Math.ceil((expirationDate - currentDate) / (1000 * 60 * 60 * 24));
 
 	const findRecipes = () => {
-		navigation.navigate("Search", { ingredient: name });
+		navigation.navigate("SearchScreen", { ingredient: name });
 	};
 
 	const handleReasonChange = (newReason) => {
