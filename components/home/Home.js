@@ -35,20 +35,20 @@ const Home = ({ navigation }) => {
 		updateExpiringItems();
 
 		// COMMENT/UNCOMMENT THIS LINE TO FETCH RECIPES
-		setLoading(false);
+		// setLoading(false);
 
 		// UNCOMMENT/COMMENT THIS CODE TO FETCH RECIPES
-		// Promise.all([fetchRecommendedRecipes(), fetchSaveTheFoodRecipes(), fetchMakeItAgainRecipes()]).then(() => {
-		// 	setLoading(false);
-		// });
+		Promise.all([fetchRecommendedRecipes(), fetchSaveTheFoodRecipes(), fetchMakeItAgainRecipes()]).then(() => {
+			setLoading(false);
+		});
 	}, []);
 
 	const handleRefresh = async () => {
 		setRefreshing(true);
 		// UNCOMMENT/COMMENT THIS CODE TO FETCH RECIPES
-		// Promise.all([fetchRecommendedRecipes(), fetchSaveTheFoodRecipes(), fetchMakeItAgainRecipes()]).then(() => {
-		// 	setLoading(false);
-		// });
+		Promise.all([fetchRecommendedRecipes(), fetchSaveTheFoodRecipes(), fetchMakeItAgainRecipes()]).then(() => {
+			setLoading(false);
+		});
 		setRefreshing(false);
 	};
 
@@ -305,7 +305,7 @@ const Home = ({ navigation }) => {
 			}
 		};
 
-		for (let i = prioritizedPantryItems.length; i >= 0; i--) {
+		for (let i = 5; i >= 0; i--) {
 			const ingredients = prioritizedPantryItems
 				.slice(0, i)
 				.map((item) => item.name)
@@ -347,8 +347,6 @@ const Home = ({ navigation }) => {
 		let recipeIds = [];
 
 		if (uniqueFinishedRecipes.length >= 5) {
-			console.log("Pirmas" + uniqueFinishedRecipes);
-
 			for (let i = 0; i < 5; i++) {
 				const similarRecipesRes = await getSimilarRecipes(uniqueFinishedRecipes[i], 2);
 				recipeIds = recipeIds.concat(similarRecipesRes);
@@ -368,7 +366,6 @@ const Home = ({ navigation }) => {
 				recipeIds = recipeIds.concat(similarRecipesRes);
 			}
 		} else {
-			console.log("TRECIAS" + uniqueFinishedRecipes);
 			const randomRecipesRes = await getRandomRecipes(10);
 			recipeIds = randomRecipesRes;
 		}

@@ -192,7 +192,6 @@ const RecipeDetails = ({ route, navigation }) => {
 			console.log(similarity + ":    Ingredient(recipe's): " + item.name + "    Product(user's): " + ingredient.name);
 			return similarity >= similarityThreshold;
 		});
-		console.log(`\n`);
 
 		if (matchingPantryItems.length === 0) {
 			return false;
@@ -350,8 +349,14 @@ const RecipeDetails = ({ route, navigation }) => {
 			return <Text>Loading ingredients...</Text>;
 		}
 
+		const similarityThreshold = 0.4;
+
 		return ingredients.map((ingredient, index) => {
-			const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
+			const matchingPantryItems = pantryItems.filter((item) => {
+				const similarity = stringSimilarity.compareTwoStrings(item.name.toLowerCase().trim(), ingredient.name.toLowerCase().trim());
+				console.log(similarity + ":    Ingredient(recipe's): " + item.name + "    Product(user's): " + ingredient.name);
+				return similarity >= similarityThreshold;
+			});
 
 			let totalPantryItemSum = 0;
 			for (const item of matchingPantryItems) {
@@ -382,9 +387,14 @@ const RecipeDetails = ({ route, navigation }) => {
 
 		let consumedProductsCount = 0;
 		let consumedProductsList = [];
+		const similarityThreshold = 0.4;
 
 		for (const ingredient of ingredients) {
-			const matchingPantryItems = pantryItems.filter((item) => item.name.toLowerCase().trim() === ingredient.name.toLowerCase().trim());
+			const matchingPantryItems = pantryItems.filter((item) => {
+				const similarity = stringSimilarity.compareTwoStrings(item.name.toLowerCase().trim(), ingredient.name.toLowerCase().trim());
+				console.log(similarity + ":    Ingredient(recipe's): " + item.name + "    Product(user's): " + ingredient.name);
+				return similarity >= similarityThreshold;
+			});
 
 			if (matchingPantryItems.length > 0) {
 				matchingPantryItems.sort((a, b) => a.date - b.date);
@@ -415,7 +425,7 @@ const RecipeDetails = ({ route, navigation }) => {
 								pantryId: pantryItem.pantryId,
 								image: pantryItem.productImageURL,
 								consumedDate: new Date(),
-								quantity: pantryItem.quantity,
+								quantity: parseFloat(pantryItem.quantity.toFixed(3)),
 								unit: pantryItem.unit,
 								expiredDate: pantryItem.date,
 								addedDate: pantryItem.addedDate,

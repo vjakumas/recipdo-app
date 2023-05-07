@@ -113,7 +113,6 @@ const AddNewProduct = () => {
 
 	const fetchProductImage = async (name) => {
 		try {
-			console.log("Client-ID " + Constants.manifest.extra.unsplashApiKey);
 			const response = await axios.get("https://api.unsplash.com/search/photos", {
 				headers: {
 					Authorization: "Client-ID " + Constants.manifest.extra.unsplashApiKey,
