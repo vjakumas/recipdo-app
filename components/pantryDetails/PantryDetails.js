@@ -17,6 +17,7 @@ import Toast from "react-native-toast-message";
 import firebase, { firestore } from "../../config/firebase/config";
 import styles from "./pantryDetails.style";
 import { useNavigation } from "@react-navigation/native";
+import { removeProduct } from "../../functions/ProductFunctions";
 import Constants from "expo-constants";
 
 const PantryDetails = ({ route }) => {
@@ -41,60 +42,6 @@ const PantryDetails = ({ route }) => {
 
 	const handleReasonChange = (newReason) => {
 		setReason(newReason);
-	};
-
-	const removeProduct = async () => {
-		if (!reason) {
-			Toast.show({
-				type: "error",
-				text1: "Reason not selected!",
-				text2: "Please select a reason for removing the product.",
-				visibilityTime: 4000,
-				autoHide: true,
-				topOffset: 60,
-				bottomOffset: 40,
-			});
-			return;
-		}
-		try {
-			const userId = firebase.auth().currentUser.uid;
-			const userDocRef = firebase.firestore().collection("users").doc(userId);
-			const userDoc = await userDocRef.get();
-			const existingPantryItems = userDoc.data().pantryItems || [];
-
-			const productToRemove = existingPantryItems.find((item) => item.pantryId === pantryId);
-			const updatedPantryItems = existingPantryItems.filter((item) => item.pantryId !== pantryId);
-
-			const updates = {
-				pantryItems: updatedPantryItems,
-			};
-
-			if (reason === "Expired") {
-				const expiredProductsList = userDoc.data().expiredProductsList || [];
-				updates.expiredProductsList = [...expiredProductsList, productToRemove];
-				updates.expiredProducts = firebase.firestore.FieldValue.increment(1);
-			} else if (reason === "Already consumed") {
-				const consumedProductsList = userDoc.data().consumedProductsList || [];
-				updates.consumedProductsList = [...consumedProductsList, productToRemove];
-				updates.consumedProducts = firebase.firestore.FieldValue.increment(1);
-			}
-
-			await userDocRef.update(updates);
-
-			Toast.show({
-				type: "success",
-				text1: "Product removed!",
-				text2: "The product has been removed from your pantry.",
-				visibilityTime: 4000,
-				autoHide: true,
-				topOffset: 60,
-				bottomOffset: 40,
-			});
-
-			navigation.navigate("PantryList");
-		} catch (error) {
-			console.error("Error removing product:", error);
-		}
 	};
 
 	const editProduct = () => {
@@ -172,7 +119,7 @@ const PantryDetails = ({ route }) => {
 								<TouchableOpacity
 									style={styles.modalConfirmButton}
 									onPress={() => {
-										removeProduct();
+										removeProduct(reason, pantryId, navigation, Toast);
 										hideModal();
 									}}>
 									<Text style={styles.modalConfirmButtonText}>Confirm</Text>

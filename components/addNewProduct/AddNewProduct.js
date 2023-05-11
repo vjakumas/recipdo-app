@@ -21,6 +21,7 @@ import Toast from "react-native-toast-message";
 import { COLORS } from "../../constants";
 import axios from "axios";
 import Constants from "expo-constants";
+import { getSuggestions } from "../../functions/ProductFunctions";
 
 const AddNewProduct = () => {
 	const [quantity, setQuantity] = useState("");
@@ -70,7 +71,7 @@ const AddNewProduct = () => {
 		if (name.length > 0) {
 			setSearchTimeout(
 				setTimeout(() => {
-					getSuggestions();
+					getSuggestions(name).then((data) => setSuggestions(data));
 				}, 300)
 			);
 		} else {
@@ -89,26 +90,6 @@ const AddNewProduct = () => {
 				<Text style={styles.suggestionText}>{suggestion.name}</Text>
 			</TouchableOpacity>
 		);
-	};
-
-	const getSuggestions = async () => {
-		try {
-			const response = await axios.get("https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/food/ingredients/autocomplete", {
-				params: {
-					query: name,
-					number: "8",
-				},
-				headers: {
-					"content-type": "application/octet-stream",
-					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
-					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-				},
-			});
-
-			setSuggestions(response.data);
-		} catch (error) {
-			console.error("Error fetching suggestions:", error);
-		}
 	};
 
 	const fetchProductImage = async (name) => {

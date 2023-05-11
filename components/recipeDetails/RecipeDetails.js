@@ -185,7 +185,7 @@ const RecipeDetails = ({ route, navigation }) => {
 	};
 
 	const isIngredientAvailable = async (ingredient) => {
-		const similarityThreshold = 0.4;
+		const similarityThreshold = 0.5;
 
 		const matchingPantryItems = pantryItems.filter((item) => {
 			const similarity = stringSimilarity.compareTwoStrings(item.name.toLowerCase().trim(), ingredient.name.toLowerCase().trim());
@@ -349,7 +349,7 @@ const RecipeDetails = ({ route, navigation }) => {
 			return <Text>Loading ingredients...</Text>;
 		}
 
-		const similarityThreshold = 0.4;
+		const similarityThreshold = 0.5;
 
 		return ingredients.map((ingredient, index) => {
 			const matchingPantryItems = pantryItems.filter((item) => {
@@ -387,7 +387,7 @@ const RecipeDetails = ({ route, navigation }) => {
 
 		let consumedProductsCount = 0;
 		let consumedProductsList = [];
-		const similarityThreshold = 0.4;
+		const similarityThreshold = 0.5;
 
 		for (const ingredient of ingredients) {
 			const matchingPantryItems = pantryItems.filter((item) => {
