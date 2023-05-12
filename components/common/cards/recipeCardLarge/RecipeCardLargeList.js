@@ -1,17 +1,20 @@
 import React from "react";
-import { ScrollView, View, StyleSheet, Dimensions } from "react-native";
+import { FlatList, View } from "react-native";
 import RecipeCard from "./RecipeCardLarge";
 import styles from "./recipeCardLargeList.style";
 
 const RecipeCardLargeList = ({ recipes }) => {
 	return (
-		<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.container}>
-			{recipes.map((recipe, index) => (
-				<View key={index} style={styles.cardWrapper}>
-					<RecipeCard key={recipe.id} recipe={recipe} />
+		<FlatList
+			data={recipes}
+			renderItem={({ item: recipe }) => (
+				<View style={styles.cardWrapper}>
+					<RecipeCard recipe={recipe} />
 				</View>
-			))}
-		</ScrollView>
+			)}
+			keyExtractor={(recipe) => recipe.id.toString()}
+			showsVerticalScrollIndicator={false}
+		/>
 	);
 };
 

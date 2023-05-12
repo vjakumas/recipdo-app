@@ -19,37 +19,7 @@ import axios from "axios";
 import { LinearGradient } from "expo-linear-gradient";
 import Constants from "expo-constants";
 import { fetchData, handleSearch } from "../../functions/SearchFunctions.js";
-import RecipeCardLarge from "../../components/common/cards/recipeCardLarge/RecipeCardLarge.js";
-
-// const RecipeCard = ({ recipe, onPress }) => {
-// 	return (
-// 		<TouchableOpacity onPress={onPress}>
-// 			<View style={styles.recipeCard}>
-// 				<View style={{ overflow: "hidden" }}>
-// 					<Image source={{ uri: recipe.image }} style={styles.recipeImage} />
-// 					<LinearGradient colors={["transparent", "rgba(0, 0, 0, 0.8)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.overlay}>
-// 						<Text style={styles.recipeType}>
-// 							{recipe.dishTypes && recipe.dishTypes[0]
-// 								? recipe.dishTypes[0].substring(0, 1).toUpperCase() + recipe.dishTypes[0].substring(1)
-// 								: "Recipe"}
-// 						</Text>
-// 						<Text style={styles.recipeName}>{recipe.title}</Text>
-// 					</LinearGradient>
-// 					<View style={styles.infoBar}>
-// 						<View style={styles.infoItem}>
-// 							<View style={styles.greenDot} />
-// 							<Text style={styles.infoText}>{recipe.extendedIngredients.length} Ingredients</Text>
-// 						</View>
-// 						<View style={styles.infoItem}>
-// 							<Ionicons name="time-outline" size={16} color="white" />
-// 							<Text style={styles.infoText}>{recipe.readyInMinutes} min</Text>
-// 						</View>
-// 					</View>
-// 				</View>
-// 			</View>
-// 		</TouchableOpacity>
-// 	);
-// };
+import RecipeCardLargeList from "../../components/common/cards/recipeCardLarge/RecipeCardLargeList.js";
 
 const Search = () => {
 	const [searchText, setSearchText] = useState("");
@@ -147,16 +117,7 @@ const Search = () => {
 								<Text style={styles.noResultsSublabel}>Find delicious recipes for any occasion</Text>
 							</View>
 						)}
-						<FlatList
-							contentContainerStyle={styles.flatListContainer}
-							data={searchResultsData}
-							renderItem={({ item }) => (
-								<View key={item.id}>
-									<RecipeCardLarge recipe={item} onRecipePress={onRecipePress} />
-								</View>
-							)}
-							keyExtractor={(item) => item.id.toString()}
-						/>
+						<RecipeCardLargeList recipes={searchResultsData} />
 					</>
 				)}
 			</SafeAreaView>
