@@ -1,4 +1,4 @@
-import { getTopConsumedProducts, getTopFavoriteRecipes } from "../functions/StatisticsFunctions";
+import { getTopConsumedProducts, getTopFavoriteRecipes } from "../StatisticsFunctions";
 
 describe("StatisticsFunctions", () => {
 	describe("getTopConsumedProducts", () => {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1684001738115" clover="3.2.0">
-  <project timestamp="1684001738115" name="All files">
-    <metrics statements="33" coveredstatements="24" conditionals="8" coveredconditionals="5" methods="10" coveredmethods="7" elements="51" coveredelements="36" complexity="0" loc="33" ncloc="33" packages="2" files="2" classes="2"/>
+<coverage generated="1684006022992" clover="3.2.0">
+  <project timestamp="1684006022992" name="All files">
+    <metrics statements="56" coveredstatements="45" conditionals="16" coveredconditionals="11" methods="13" coveredmethods="10" elements="85" coveredelements="66" complexity="0" loc="56" ncloc="56" packages="2" files="3" classes="3"/>
     <package name="config.firebase">
       <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="1" methods="0" coveredmethods="0"/>
       <file name="config.js" path="C:\Users\viliu\Desktop\recipdo-app\config\firebase\config.js">
@@ -14,7 +14,33 @@
       </file>
     </package>
     <package name="functions">
-      <metrics statements="28" coveredstatements="19" conditionals="6" coveredconditionals="4" methods="10" coveredmethods="7"/>
+      <metrics statements="51" coveredstatements="40" conditionals="14" coveredconditionals="10" methods="13" coveredmethods="10"/>
+      <file name="SearchFunctions.js" path="C:\Users\viliu\Desktop\recipdo-app\functions\SearchFunctions.js">
+        <metrics statements="23" coveredstatements="21" conditionals="8" coveredconditionals="6" methods="3" coveredmethods="3"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="5" type="stmt"/>
+        <line num="6" count="5" type="stmt"/>
+        <line num="7" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="8" count="5" type="stmt"/>
+        <line num="9" count="5" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="39" count="5" type="stmt"/>
+        <line num="40" count="5" type="stmt"/>
+        <line num="42" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="44" count="4" type="stmt"/>
+        <line num="55" count="4" type="stmt"/>
+        <line num="57" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="58" count="4" type="stmt"/>
+        <line num="59" count="4" type="stmt"/>
+        <line num="61" count="1" type="stmt"/>
+        <line num="62" count="1" type="stmt"/>
+        <line num="63" count="1" type="stmt"/>
+        <line num="67" count="1" type="stmt"/>
+        <line num="77" count="1" type="stmt"/>
+        <line num="78" count="1" type="stmt"/>
+        <line num="79" count="1" type="cond" truecount="1" falsecount="1"/>
+      </file>
       <file name="StatisticsFunctions.js" path="C:\Users\viliu\Desktop\recipdo-app\functions\StatisticsFunctions.js">
         <metrics statements="28" coveredstatements="19" conditionals="6" coveredconditionals="4" methods="10" coveredmethods="7"/>
         <line num="3" count="1" type="stmt"/>

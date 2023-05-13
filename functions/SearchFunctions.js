@@ -1,7 +1,5 @@
 import axios from "axios";
 import Constants from "expo-constants";
-import firebase, { firestore } from "../config/firebase/config";
-import { Keyboard } from "react-native";
 
 export const fetchData = async (searchText, searchType, setSearchResultsId, setSearchResultsData, setLoading) => {
 	let url = "";
@@ -60,7 +58,6 @@ export const fetchData = async (searchText, searchType, setSearchResultsId, setS
 		setSearchResultsData(recipeInfoResponse.data);
 		setLoading(false);
 	} catch (error) {
-		console.error(error);
 		setSearchResultsId([]);
 		setSearchResultsData([]);
 		setLoading(false);
