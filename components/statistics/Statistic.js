@@ -4,6 +4,7 @@ import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
 import { PieChart } from "react-native-svg-charts";
 import { Circle, G, Line, Text as SvgText } from "react-native-svg";
+import { fetchUserData, getTopConsumedProducts, getTopFavoriteRecipes } from "../../functions/StatisticsFunctions";
 import firebase, { firestore } from "../../config/firebase/config";
 import styles from "./statistic.style";
 
@@ -23,22 +24,7 @@ const Statistic = () => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const userId = firebase.auth().currentUser.uid;
-			try {
-				const docRef = firebase.firestore().collection("users").doc(userId);
-
-				const unsubscribe = docRef.onSnapshot((doc) => {
-					if (doc.exists) {
-						setUserData(doc.data());
-					} else {
-						console.log("No such document!");
-					}
-				});
-
-				return () => unsubscribe();
-			} catch (error) {
-				console.log("Error getting document:", error);
-			}
+			await fetchUserData(setUserData);
 		};
 
 		fetchData();
@@ -74,42 +60,6 @@ const Statistic = () => {
 		});
 	};
 
-	const getTopConsumedProducts = (consumedProductsList) => {
-		let productCounts = {};
-
-		consumedProductsList.forEach((product) => {
-			if (productCounts[product.name]) {
-				productCounts[product.name] += 1; // Increment the count of the product by 1
-			} else {
-				productCounts[product.name] = 1; // Initialize the count of the product to 1
-			}
-		});
-
-		const sortedProducts = Object.entries(productCounts)
-			.sort((a, b) => b[1] - a[1])
-			.slice(0, 3);
-
-		return sortedProducts.map(([name, count]) => ({ name, count }));
-	};
-
-	const getTopFavoriteRecipes = (finishedRecipes) => {
-		let recipeCounts = {};
-
-		finishedRecipes.forEach((recipe) => {
-			if (recipeCounts[recipe.id]) {
-				recipeCounts[recipe.id].count += 1;
-			} else {
-				recipeCounts[recipe.id] = { ...recipe, count: 1 };
-			}
-		});
-
-		const sortedRecipes = Object.values(recipeCounts)
-			.sort((a, b) => b.count - a.count)
-			.slice(0, 3);
-
-		return sortedRecipes;
-	};
-
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.logoContainer}>
@@ -117,7 +67,6 @@ const Statistic = () => {
 			</View>
 			<ScrollView>
 				<View style={styles.statisticsContainer}>
-					{/* <Text style={styles.title}>Statistics</Text> */}
 					<View style={styles.pieChartContainer}>
 						<PieChart
 							style={{ height: 150 }}

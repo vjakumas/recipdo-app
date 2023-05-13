@@ -8,6 +8,7 @@ import { SIZES, COLORS, FONT, SHADOWS } from "../../constants";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import Constants from "expo-constants";
+import { fetchSavedRecipes } from "../../functions/RecipeFunctions";
 
 const SavedRecipes = () => {
 	const [recipes, setRecipes] = useState([]);
@@ -16,37 +17,12 @@ const SavedRecipes = () => {
 	const navigation = useNavigation();
 
 	useEffect(() => {
-		fetchSavedRecipes();
+		fetchSavedRecipes(setRecipes, setIsLoading);
 	}, []);
-
-	const fetchSavedRecipes = async () => {
-		try {
-			const userId = firebase.auth().currentUser.uid;
-			const userDoc = await firestore.collection("users").doc(userId).get();
-			const savedRecipeIds = userDoc.data().savedRecipes.join(",");
-			const options = {
-				method: "GET",
-				url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk",
-				params: { ids: savedRecipeIds },
-				headers: {
-					"content-type": "application/octet-stream",
-					"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
-					"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-				},
-			};
-
-			const response = await axios.request(options);
-			setRecipes(response.data);
-		} catch (error) {
-			console.error("Error fetching saved recipes:", error);
-		} finally {
-			setIsLoading(false);
-		}
-	};
 
 	const handleRefresh = async () => {
 		setRefreshing(true);
-		await fetchSavedRecipes();
+		fetchSavedRecipes(setRecipes, setIsLoading);
 		setRefreshing(false);
 	};
 

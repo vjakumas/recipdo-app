@@ -235,3 +235,28 @@ const fetchRecipesForSaveTheFood = async (prioritizedPantryItems) => {
 const timestampToDate = (timestamp) => {
 	return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
 };
+
+export const fetchSavedRecipes = async (setRecipes, setIsLoading) => {
+	try {
+		const userId = firebase.auth().currentUser.uid;
+		const userDoc = await firestore.collection("users").doc(userId).get();
+		const savedRecipeIds = userDoc.data().savedRecipes.join(",");
+		const options = {
+			method: "GET",
+			url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk",
+			params: { ids: savedRecipeIds },
+			headers: {
+				"content-type": "application/octet-stream",
+				"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
+				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+			},
+		};
+
+		const response = await axios.request(options);
+		setRecipes(response.data);
+	} catch (error) {
+		console.error("Error fetching saved recipes:", error);
+	} finally {
+		setIsLoading(false);
+	}
+};
