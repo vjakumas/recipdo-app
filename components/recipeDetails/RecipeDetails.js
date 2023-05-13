@@ -20,6 +20,19 @@ import firebase, { firestore } from "../../config/firebase/config";
 import axios from "axios";
 import Constants from "expo-constants";
 import stringSimilarity from "string-similarity";
+import {
+	fetchRecipeDetails,
+	toggleSaveRecipe,
+	fetchPantryItems,
+	fetchIngredients,
+	fetchNutritionData,
+	isCommonMeasurement,
+	isIngredientAvailable,
+	checkIfRecipeIsSaved,
+	convertIngredientAmount,
+	finishRecipe,
+	subtractIngredients,
+} from "../../functions/RecipeDetailsFunctions";
 
 const RecipeDetails = ({ route, navigation }) => {
 	const [recipe, setRecipe] = useState(route.params.recipe);
@@ -47,10 +60,17 @@ const RecipeDetails = ({ route, navigation }) => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			await fetchPantryItems();
-			await fetchIngredients();
-			await checkIfRecipeIsSaved();
-			await fetchNutritionData();
+			const fetchedPantryItemsData = await fetchPantryItems();
+			setPantryItems(fetchedPantryItemsData);
+
+			const fetchedIngredientData = await fetchIngredients(recipe);
+			setIngredients(fetchedIngredientData);
+
+			const checkIfRecipeIsSavedData = await checkIfRecipeIsSaved(recipe, setIsSaved);
+			setIsSaved(checkIfRecipeIsSavedData);
+
+			const fetchedNutritionData = await fetchNutritionData(recipe);
+			setNutritionData(fetchedNutritionData);
 			setIsLoading(false);
 		};
 		setIsLoading(true);
@@ -69,7 +89,7 @@ const RecipeDetails = ({ route, navigation }) => {
 
 			const availability = await Promise.all(
 				ingredients.map(async (ingredient) => {
-					return await isIngredientAvailable(ingredient);
+					return await isIngredientAvailable(ingredient, pantryItems);
 				})
 			);
 
@@ -86,262 +106,12 @@ const RecipeDetails = ({ route, navigation }) => {
 		};
 	}, [pantryItems, ingredients]);
 
-	const fetchRecipeDetails = async (recipeId) => {
-		const options = {
-			method: "GET",
-			url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${recipeId}/information`,
-			headers: {
-				"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
-				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-			},
-		};
-
-		try {
-			const response = await fetch(options.url, options);
-			const data = await response.json();
-			setRecipe(data);
-		} catch (error) {
-			console.error("Error fetching recipe details:", error);
-		}
-	};
-
-	const toggleSaveRecipe = async () => {
-		const userId = firebase.auth().currentUser.uid;
-		const userDocRef = firebase.firestore().collection("users").doc(userId);
-		const userDoc = await userDocRef.get();
-		const existingSavedRecipeIds = userDoc.data().savedRecipes || [];
-
-		let updatedSavedRecipeIds;
-		if (existingSavedRecipeIds.includes(recipe.id.toString())) {
-			updatedSavedRecipeIds = existingSavedRecipeIds.filter((id) => id !== recipe.id.toString());
-		} else {
-			updatedSavedRecipeIds = [...existingSavedRecipeIds, recipe.id.toString()];
-		}
-
-		await userDocRef.update({
-			savedRecipes: updatedSavedRecipeIds,
-		});
-
-		setIsSaved(!isSaved);
-	};
-
-	const fetchPantryItems = async () => {
-		const userId = firebase.auth().currentUser.uid;
-		const userDocRef = firebase.firestore().collection("users").doc(userId);
-		const userDoc = await userDocRef.get();
-		const userPantryItems = userDoc.data().pantryItems || [];
-		setPantryItems(userPantryItems);
-	};
-
-	const fetchIngredients = async () => {
-		const options = {
-			method: "GET",
-			url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${recipe.id}/ingredientWidget.json`,
-			headers: {
-				"content-type": "application/octet-stream",
-				"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
-				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-			},
-		};
-
-		try {
-			const response = await axios.request(options);
-			setIngredients(response.data.ingredients);
-		} catch (error) {
-			console.error("Error fetching ingredients:", error);
-		}
-	};
-
-	const fetchNutritionData = async () => {
-		try {
-			const response = await axios.get(
-				`https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${recipe.id}/nutritionWidget.json`,
-				{
-					headers: {
-						"content-type": "application/octet-stream",
-						"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
-						"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-					},
-				}
-			);
-			setNutritionData(response.data);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
 	const showModal = () => {
 		setModalVisible(true);
 	};
 
 	const hideModal = () => {
 		setModalVisible(false);
-	};
-
-	// Helper function to check if a unit is a common measurement
-	const isCommonMeasurement = (unit) => {
-		const commonMeasurements = ["g", "ml", "kg", "l", "oz", "cup", "tsp", "tbsp", "pint", "quart", "gallon", "inch"];
-		return commonMeasurements.includes(unit.toLowerCase());
-	};
-
-	const isIngredientAvailable = async (ingredient) => {
-		const similarityThreshold = 0.5;
-
-		const matchingPantryItems = pantryItems.filter((item) => {
-			const similarity = stringSimilarity.compareTwoStrings(item.name.toLowerCase().trim(), ingredient.name.toLowerCase().trim());
-			console.log(similarity + ":    Ingredient(recipe's): " + item.name + "    Product(user's): " + ingredient.name);
-			return similarity >= similarityThreshold;
-		});
-
-		if (matchingPantryItems.length === 0) {
-			return false;
-		}
-
-		let totalPantryItemQuantity = 0;
-
-		const ingredientUnit = ingredient.amount.metric.unit || "unit";
-
-		// If the ingredient's unit is not a common measurement, try to convert it to grams
-		if (!isCommonMeasurement(ingredientUnit)) {
-			try {
-				const convertedIngredient = await convertIngredientAmount(
-					ingredient.name,
-					ingredientUnit,
-					ingredient.amount.metric.unit,
-					ingredient.amount.metric.value
-				);
-				if (convertedIngredient) {
-					ingredient.amount.metric.value = convertedIngredient;
-				} else {
-					ingredient.amount.metric.unit = "unit";
-				}
-			} catch (error) {
-				console.error("Error converting uncommon unit to grams:", error);
-				ingredient.amount.metric.unit = "unit";
-			}
-		}
-
-		// If the ingredient has a 'unit' measurement, sum the total pantry item quantity without conversion
-		if (ingredientUnit === "unit") {
-			totalPantryItemQuantity = parseInt(matchingPantryItems.reduce((acc, item) => parseInt(acc) + parseInt(item.quantity), 0));
-			if (parseInt(totalPantryItemQuantity) >= parseInt(ingredient.amount.metric.value) === true) {
-				return true;
-			}
-		}
-
-		for (const item of matchingPantryItems) {
-			if (item.unit === "unit") {
-				continue;
-			}
-			const convertedAmount = await convertIngredientAmount(ingredient.name, ingredientUnit, item.unit, item.quantity);
-			totalPantryItemQuantity += convertedAmount || 0;
-		}
-
-		if (!isCommonMeasurement(ingredient.amount.metric.unit) && ingredient.amount.metric.unit === "unit") {
-			totalPantryItemQuantity = 0;
-			for (const item of matchingPantryItems) {
-				totalPantryItemQuantity += parseInt(item.quantity);
-			}
-			return totalPantryItemQuantity >= parseInt(ingredient.amount.metric.value);
-		}
-
-		const convertedIngredientAmount = await convertIngredientAmount(
-			ingredient.name,
-			matchingPantryItems[0].unit,
-			ingredientUnit,
-			ingredient.amount.metric.value
-		);
-
-		if (convertedIngredientAmount === null) {
-			console.error("Error converting ingredient amount");
-			return false;
-		}
-
-		return totalPantryItemQuantity >= convertedIngredientAmount;
-	};
-
-	const checkIfRecipeIsSaved = async () => {
-		const userId = firebase.auth().currentUser.uid;
-		const userDocRef = firebase.firestore().collection("users").doc(userId);
-		const userDoc = await userDocRef.get();
-		const existingSavedRecipeIds = userDoc.data().savedRecipes || [];
-
-		const isRecipeSaved = existingSavedRecipeIds.includes(recipe.id.toString());
-		setIsSaved(isRecipeSaved);
-	};
-
-	const convertIngredientAmount = async (ingredientName, targetUnit, sourceUnit, sourceAmount) => {
-		const options = {
-			method: "GET",
-			url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/convert",
-			params: {
-				ingredientName,
-				targetUnit,
-				sourceUnit,
-				sourceAmount,
-			},
-			headers: {
-				"content-type": "application/octet-stream",
-				"X-RapidAPI-Key": Constants.manifest.extra.spoonacularApiKey,
-				"X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-			},
-		};
-
-		try {
-			const response = await axios.request(options);
-			return response.data.targetAmount;
-		} catch (error) {
-			console.error(error);
-			return null;
-		}
-	};
-
-	const finishRecipe = async (recipe) => {
-		setModalLoading(true);
-		const userId = firebase.auth().currentUser.uid;
-		const userRef = firestore.collection("users").doc(userId);
-
-		try {
-			const userDoc = await userRef.get();
-			const finishedRecipes = userDoc.data().finishedRecipes;
-
-			const newRecipe = {
-				id: recipe.id,
-				title: recipe.title,
-				servings: recipe.servings,
-				readyInMinutes: recipe.readyInMinutes,
-				image: recipe.image,
-				extendedIngredients: recipe.extendedIngredients,
-				dishTypes: recipe.dishTypes,
-				instructions: recipe.instructions,
-			};
-
-			finishedRecipes.push(newRecipe);
-
-			await userRef.update({
-				finishedRecipes: finishedRecipes,
-			});
-
-			await subtractIngredients();
-
-			Toast.show({
-				type: "success",
-				text1: "Recipe marked as finished!",
-				text2: "Ingredients have been subtracted.",
-				visibilityTime: 3000,
-				autoHide: true,
-				topOffset: 60,
-				bottomOffset: 40,
-			});
-
-			navigation.navigate("Home");
-
-			hideModal();
-		} catch (error) {
-			console.error("Error marking recipe as finished:", error);
-			setModalLoading(false);
-		}
-		setModalLoading(false);
 	};
 
 	const renderIngredients = () => {
@@ -354,7 +124,7 @@ const RecipeDetails = ({ route, navigation }) => {
 		return ingredients.map((ingredient, index) => {
 			const matchingPantryItems = pantryItems.filter((item) => {
 				const similarity = stringSimilarity.compareTwoStrings(item.name.toLowerCase().trim(), ingredient.name.toLowerCase().trim());
-				console.log(similarity + ":    Ingredient(recipe's): " + item.name + "    Product(user's): " + ingredient.name);
+				// console.log(similarity + ":    Ingredient(recipe's): " + item.name + "    Product(user's): " + ingredient.name);
 				return similarity >= similarityThreshold;
 			});
 
@@ -378,130 +148,6 @@ const RecipeDetails = ({ route, navigation }) => {
 					</Text>
 				</View>
 			);
-		});
-	};
-
-	const subtractIngredients = async () => {
-		const userId = firebase.auth().currentUser.uid;
-		const userRef = firestore.collection("users").doc(userId);
-
-		let consumedProductsCount = 0;
-		let consumedProductsList = [];
-		const similarityThreshold = 0.5;
-
-		for (const ingredient of ingredients) {
-			const matchingPantryItems = pantryItems.filter((item) => {
-				const similarity = stringSimilarity.compareTwoStrings(item.name.toLowerCase().trim(), ingredient.name.toLowerCase().trim());
-				console.log(similarity + ":    Ingredient(recipe's): " + item.name + "    Product(user's): " + ingredient.name);
-				return similarity >= similarityThreshold;
-			});
-
-			if (matchingPantryItems.length > 0) {
-				matchingPantryItems.sort((a, b) => a.date - b.date);
-				let remainingAmount = ingredient.amount.metric.value;
-				for (const pantryItem of matchingPantryItems) {
-					if (isCommonMeasurement(ingredient.amount.metric.unit)) {
-						const convertedAmount = await convertIngredientAmount(
-							ingredient.name,
-							ingredient.amount.metric.unit,
-							pantryItem.unit,
-							pantryItem.quantity
-						);
-						if (convertedAmount > remainingAmount) {
-							const convertedAmountToOriginal = await convertIngredientAmount(
-								ingredient.name,
-								pantryItem.unit,
-								ingredient.amount.metric.unit,
-								convertedAmount - remainingAmount
-							);
-							pantryItem.quantity = convertedAmountToOriginal.toString();
-							remainingAmount = 0;
-						} else {
-							remainingAmount -= convertedAmount;
-							consumedProductsCount += 1;
-
-							const newItem = {
-								name: pantryItem.name,
-								pantryId: pantryItem.pantryId,
-								image: pantryItem.productImageURL,
-								consumedDate: new Date(),
-								quantity: parseFloat(pantryItem.quantity.toFixed(3)),
-								unit: pantryItem.unit,
-								expiredDate: pantryItem.date,
-								addedDate: pantryItem.addedDate,
-								calories: pantryItem.calories,
-								fat: pantryItem.fats,
-								carbs: pantryItem.carbs,
-								protein: pantryItem.protein,
-							};
-
-							consumedProductsList.push(newItem);
-
-							pantryItem.quantity = 0;
-
-							const index = pantryItems.indexOf(pantryItem);
-							if (index !== -1) {
-								pantryItems.splice(index, 1);
-							}
-						}
-
-						if (remainingAmount <= 0) {
-							break;
-						}
-					} else {
-						if (pantryItem.quantity > remainingAmount) {
-							pantryItem.quantity -= remainingAmount;
-							pantryItem.quantity = pantryItem.quantity.toString();
-							remainingAmount = 0;
-						} else {
-							remainingAmount -= pantryItem.quantity;
-
-							const newItem = {
-								name: pantryItem.name,
-								pantryId: pantryItem.pantryId,
-								image: pantryItem.productImageURL,
-								consumedDate: new Date(),
-								quantity: pantryItem.quantity,
-								unit: pantryItem.unit,
-								expiredDate: pantryItem.date,
-								addedDate: pantryItem.addedDate,
-								calories: pantryItem.calories,
-								fat: pantryItem.fats,
-								carbs: pantryItem.carbs,
-								protein: pantryItem.protein,
-							};
-
-							consumedProductsList.push(newItem);
-
-							pantryItem.quantity = 0;
-
-							const index = pantryItems.indexOf(pantryItem);
-							if (index !== -1) {
-								pantryItems.splice(index, 1);
-							}
-						}
-
-						if (remainingAmount <= 0) {
-							break;
-						}
-					}
-				}
-
-				await userRef.update({
-					pantryItems: pantryItems,
-				});
-				updateConsumedProducts(consumedProductsCount, consumedProductsList);
-			}
-		}
-	};
-
-	const updateConsumedProducts = async (count, list) => {
-		const userId = firebase.auth().currentUser.uid;
-		const userRef = firestore.collection("users").doc(userId);
-
-		await userRef.update({
-			consumedProducts: firebase.firestore.FieldValue.increment(count),
-			consumedProductsList: firebase.firestore.FieldValue.arrayUnion(...list),
 		});
 	};
 
@@ -562,7 +208,19 @@ const RecipeDetails = ({ route, navigation }) => {
 										<TouchableOpacity style={styles.modalCancelButton} onPress={hideModal}>
 											<Text style={styles.modalCancelButtonText}>Cancel</Text>
 										</TouchableOpacity>
-										<TouchableOpacity style={styles.modalConfirmButton} onPress={() => finishRecipe(recipe)}>
+										<TouchableOpacity
+											style={styles.modalConfirmButton}
+											onPress={() =>
+												finishRecipe(
+													recipe,
+													navigation,
+													hideModal,
+													subtractIngredients,
+													setModalLoading,
+													ingredients,
+													pantryItems
+												)
+											}>
 											<Text style={styles.modalConfirmButtonText}>Confirm</Text>
 										</TouchableOpacity>
 									</View>
