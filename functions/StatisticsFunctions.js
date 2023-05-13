@@ -1,5 +1,3 @@
-import axios from "axios";
-import Constants from "expo-constants";
 import firebase, { firestore } from "../config/firebase/config";
 
 export const fetchUserData = async (setUserData) => {
