@@ -9,6 +9,7 @@ export const fetchUserData = async () => {
 
 		if (snapshot.exists) {
 			userData = snapshot.data();
+			console.log(userData);
 		} else {
 			console.log("User does not exist");
 		}

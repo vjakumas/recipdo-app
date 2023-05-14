@@ -22,6 +22,8 @@ export const fetchUserData = async (setUserData) => {
 export const getTopConsumedProducts = (consumedProductsList) => {
 	let productCounts = {};
 
+	// console.log(consumedProductsList);
+
 	consumedProductsList.forEach((product) => {
 		if (productCounts[product.name]) {
 			productCounts[product.name] += 1; // Increment the count of the product by 1
@@ -39,6 +41,8 @@ export const getTopConsumedProducts = (consumedProductsList) => {
 
 export const getTopFavoriteRecipes = (finishedRecipes) => {
 	let recipeCounts = {};
+
+	console.log(finishedRecipes);
 
 	finishedRecipes.forEach((recipe) => {
 		if (recipeCounts[recipe.id]) {
