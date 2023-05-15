@@ -1,0 +1,383 @@
+{
+	"info": {
+		"_postman_id": "3b4aff75-939a-436b-9299-f51f573902e5",
+		"name": "RecipdoTests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23775058"
+	},
+	"item": [
+		{
+			"name": "Recipe search",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-RapidAPI-Key",
+						"value": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+						"type": "text"
+					},
+					{
+						"key": "X-RapidAPI-Host",
+						"value": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch?query=kale salads&number=1",
+					"protocol": "https",
+					"host": [
+						"spoonacular-recipe-food-nutrition-v1",
+						"p",
+						"rapidapi",
+						"com"
+					],
+					"path": [
+						"recipes",
+						"complexSearch"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "kale salads"
+						},
+						{
+							"key": "number",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recipe by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-RapidAPI-Key",
+						"value": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+						"type": "text"
+					},
+					{
+						"key": "X-RapidAPI-Host",
+						"value": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/479101/information",
+					"protocol": "https",
+					"host": [
+						"spoonacular-recipe-food-nutrition-v1",
+						"p",
+						"rapidapi",
+						"com"
+					],
+					"path": [
+						"recipes",
+						"479101",
+						"information"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Random Recipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-RapidAPI-Key",
+						"value": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+						"type": "text"
+					},
+					{
+						"key": "X-RapidAPI-Host",
+						"value": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?number=1",
+					"protocol": "https",
+					"host": [
+						"spoonacular-recipe-food-nutrition-v1",
+						"p",
+						"rapidapi",
+						"com"
+					],
+					"path": [
+						"recipes",
+						"random"
+					],
+					"query": [
+						{
+							"key": "number",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recipe by ingredient",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-RapidAPI-Key",
+						"value": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+						"type": "text"
+					},
+					{
+						"key": "X-RapidAPI-Host",
+						"value": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?ingredients=\"apple,kale,lemon\"&number=2",
+					"protocol": "https",
+					"host": [
+						"spoonacular-recipe-food-nutrition-v1",
+						"p",
+						"rapidapi",
+						"com"
+					],
+					"path": [
+						"recipes",
+						"findByIngredients"
+					],
+					"query": [
+						{
+							"key": "ingredients",
+							"value": "\"apple,kale,lemon\""
+						},
+						{
+							"key": "number",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ingredient by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-RapidAPI-Key",
+						"value": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+						"type": "text"
+					},
+					{
+						"key": "X-RapidAPI-Host",
+						"value": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/food/ingredients/9266/information",
+					"protocol": "https",
+					"host": [
+						"spoonacular-recipe-food-nutrition-v1",
+						"p",
+						"rapidapi",
+						"com"
+					],
+					"path": [
+						"food",
+						"ingredients",
+						"9266",
+						"information"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ingredient by name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-RapidAPI-Key",
+						"value": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+						"type": "text"
+					},
+					{
+						"key": "X-RapidAPI-Host",
+						"value": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/food/ingredients/search?query=yogurt&number=1",
+					"protocol": "https",
+					"host": [
+						"spoonacular-recipe-food-nutrition-v1",
+						"p",
+						"rapidapi",
+						"com"
+					],
+					"path": [
+						"food",
+						"ingredients",
+						"search"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "yogurt"
+						},
+						{
+							"key": "number",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Autocomplete ingredient",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-RapidAPI-Key",
+						"value": "cf5c25b71bmsh88d9f572c64eb2ep1f4ac9jsn06f2d083bd96",
+						"type": "text"
+					},
+					{
+						"key": "X-RapidAPI-Host",
+						"value": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/food/ingredients/autocomplete?query=appl&number=2",
+					"protocol": "https",
+					"host": [
+						"spoonacular-recipe-food-nutrition-v1",
+						"p",
+						"rapidapi",
+						"com"
+					],
+					"path": [
+						"food",
+						"ingredients",
+						"autocomplete"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "appl"
+						},
+						{
+							"key": "number",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
