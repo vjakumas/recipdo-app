@@ -1,15 +1,9 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
 import { AppRegistry } from "react-native";
 import { useFonts } from "expo-font";
-import { COLORS, icons, images, SIZES } from "./constants";
 import React, { useState, useEffect } from "react";
 import firebase from "./config/firebase/config";
-import Toast from "react-native-toast-message";
 
 import AppNavigator from "./navigation/AppNavigator";
-
-const Stack = createStackNavigator();
 
 function App() {
 	const [initializing, setInitializing] = useState(true);

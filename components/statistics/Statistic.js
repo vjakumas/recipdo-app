@@ -19,7 +19,6 @@ const Statistic = () => {
 	});
 	const [topConsumedProducts, setTopConsumedProducts] = useState([]);
 	const [topFavoriteRecipes, setTopFavoriteRecipes] = useState([]);
-	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -34,7 +33,7 @@ const Statistic = () => {
 		setTopFavoriteRecipes(getTopFavoriteRecipes(userData.finishedRecipes));
 	}, [userData]);
 
-	const renderPieLabel = ({ slices, height, width }) => {
+	const renderPieLabel = ({ slices }) => {
 		console.log("Rendering pie labels");
 		return slices.map((slice, index) => {
 			const { labelCentroid, pieCentroid, data } = slice;

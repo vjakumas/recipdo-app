@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
+import { COLORS, FONT, SIZES } from "../../constants";
 
 const styles = StyleSheet.create({
 	container: {
@@ -88,9 +88,6 @@ const styles = StyleSheet.create({
 	statisticLabelContainer: {
 		flexDirection: "row",
 		alignItems: "center",
-	},
-	statisticCardContent: {
-		marginLeft: 15,
 	},
 	statisticCardContent: {
 		fontFamily: FONT.bold,

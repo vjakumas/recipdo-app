@@ -2,14 +2,13 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet } from "react-nativ
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import firebase from "./config/firebase/config";
-import { Touchable } from "react-native";
 
 const Login = () => {
 	const navigation = useNavigation();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
-	loginUser = async (email, password) => {
+	const loginUser = async (email, password) => {
 		try {
 			await firebase.auth().signInWithEmailAndPassword(email, password);
 			navigation.navigate("Home");

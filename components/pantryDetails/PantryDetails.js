@@ -13,7 +13,6 @@ const PantryDetails = ({ route }) => {
 	const fats = route.params.fats || "N/A";
 	const protein = route.params.protein || "N/A";
 	const calories = route.params.calories || "N/A";
-	const [isLoading, setIsLoading] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [reason, setReason] = useState("");
 

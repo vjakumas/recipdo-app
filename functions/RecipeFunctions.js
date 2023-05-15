@@ -38,7 +38,6 @@ const getRecommendedRecipes = async () => {
 
 	// Get user's saved and finished recipes
 	const userDoc = await userRef.get();
-	const savedRecipes = userDoc.data().savedRecipes;
 	const finishedRecipes = userDoc.data().finishedRecipes;
 
 	const uniqueRecipeIds = new Set();
