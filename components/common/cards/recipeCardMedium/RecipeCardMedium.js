@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import styles from "./recipeCardMedium.style";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";

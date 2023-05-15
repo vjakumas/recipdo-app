@@ -1,12 +1,10 @@
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, ImageBackground, TouchableWithoutFeedback, Keyboard } from "react-native";
 import React, { useState } from "react";
-import { useNavigation, CommonActions } from "@react-navigation/native";
-import { COLORS, icons, images, SIZES } from "../../constants";
+import { useNavigation } from "@react-navigation/native";
+import { COLORS, images } from "../../constants";
 import styles from "./register.style";
 
 import firebase from "../../config/firebase/config";
-import { Touchable } from "react-native";
-import Login from "../login/Login";
 
 const Register = () => {
 	const navigation = useNavigation();

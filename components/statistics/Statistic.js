@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, View, Image, Text, StyleSheet, ScrollView } from "react-native";
-import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
+import { SafeAreaView, View, Image, Text, ScrollView } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { COLORS } from "../../constants";
 import { PieChart } from "react-native-svg-charts";
 import { Circle, G, Line, Text as SvgText } from "react-native-svg";
 import { fetchUserData, getTopConsumedProducts, getTopFavoriteRecipes } from "../../functions/StatisticsFunctions";
-import firebase, { firestore } from "../../config/firebase/config";
 import styles from "./statistic.style";
 
 const Statistic = () => {

@@ -1,14 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, SafeAreaView, TouchableWithoutFeedback, Keyboard } from "react-native";
-import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
+import { View, Text, TextInput, TouchableOpacity, Image, SafeAreaView, TouchableWithoutFeedback, Keyboard } from "react-native";
 import Toast from "react-native-toast-message";
 import styles from "./settings.style";
-import firebase, { firestore } from "../../config/firebase/config";
-import * as FileSystem from "expo-file-system";
-import axios from "axios";
-import Constants from "expo-constants";
+import firebase from "../../config/firebase/config";
 
 const Settings = () => {
 	const [name, setName] = useState("");

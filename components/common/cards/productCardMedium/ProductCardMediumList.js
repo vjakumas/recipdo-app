@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, View, ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native";
 import ProductCardMedium from "./ProductCardMedium";
 import styles from "./productCardMediumList.style";
 

@@ -1,24 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-	SafeAreaView,
-	ScrollView,
-	ActivityIndicator,
-	TouchableOpacity,
-	View,
-	Text,
-	Image,
-	Modal,
-	TouchableWithoutFeedback,
-	Alert,
-} from "react-native";
+import { SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, View, Text, Image, Modal, TouchableWithoutFeedback } from "react-native";
 
-import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
-import Toast from "react-native-toast-message";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { COLORS } from "../../constants";
 import styles from "./recipeDetails.style";
-import firebase, { firestore } from "../../config/firebase/config";
-import axios from "axios";
-import Constants from "expo-constants";
 import stringSimilarity from "string-similarity";
 import {
 	fetchRecipeDetails,
@@ -26,10 +11,8 @@ import {
 	fetchPantryItems,
 	fetchIngredients,
 	fetchNutritionData,
-	isCommonMeasurement,
 	isIngredientAvailable,
 	checkIfRecipeIsSaved,
-	convertIngredientAmount,
 	finishRecipe,
 	subtractIngredients,
 } from "../../functions/RecipeDetailsFunctions";

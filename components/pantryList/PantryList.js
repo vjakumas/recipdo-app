@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, TextInput, SafeAreaView, Image, TouchableOpacity, Text, ActivityIndicator } from "react-native";
+import { View, TextInput, SafeAreaView, Image, Text, ActivityIndicator } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./pantryList.style";
 import { COLORS } from "../../constants";
 import ProductCardMediumList from "../../components/common/cards/productCardMedium/ProductCardMediumList";
-import ProductCardLarge from "../../components/common/cards/productCardLarge/ProductCardLarge";
 import ProductCardLargeList from "../../components/common/cards/productCardLarge/ProductCardLargeList";
 import firebase from "../../config/firebase/config";
 import { ScrollView } from "react-native-gesture-handler";

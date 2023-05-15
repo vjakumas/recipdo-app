@@ -1,15 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Image, ActivityIndicator, RefreshControl } from "react-native";
-import firebase, { firestore } from "../../config/firebase/config";
+import { View, Text, SafeAreaView, ScrollView, Image, ActivityIndicator, RefreshControl } from "react-native";
+import firebase from "../../config/firebase/config";
 import styles from "./home.style";
-import { COLORS, FONTS, SIZES } from "../../constants/theme";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { COLORS } from "../../constants/theme";
 import RecipeCardMediumList from "../common/cards/recipeCardMedium/RecipeCardMediumList";
 import RecipeCardMediumSafeFoodList from "../common/cards/recipeCardMediumSafeFood/RecipeCardMediumSafeFoodList";
 import ProfileDropdown from "../common/dropdown/profileDropdown/ProfileDropdown";
-import axios from "axios";
-import Constants from "expo-constants";
 import { fetchUserData } from "../../functions/UserFunctions";
 import { fetchRecommendedRecipes, fetchSaveTheFoodRecipes, fetchMakeItAgainRecipes } from "../../functions/RecipeFunctions";
 

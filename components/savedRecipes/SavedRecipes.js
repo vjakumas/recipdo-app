@@ -3,11 +3,8 @@ import { View, Text, FlatList, Image, TouchableOpacity, SafeAreaView, ActivityIn
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "./savedRecipes.style";
-import firebase, { firestore } from "../../config/firebase/config";
-import { SIZES, COLORS, FONT, SHADOWS } from "../../constants";
-import axios from "axios";
+import { SIZES, COLORS, FONT } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
-import Constants from "expo-constants";
 import { fetchSavedRecipes } from "../../functions/RecipeFunctions";
 
 const SavedRecipes = () => {

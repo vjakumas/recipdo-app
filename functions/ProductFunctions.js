@@ -1,7 +1,6 @@
 import axios from "axios";
 import Constants from "expo-constants";
-import firebase, { firestore } from "../config/firebase/config";
-import Toast from "react-native-toast-message";
+import firebase from "../config/firebase/config";
 
 export const removeProduct = async (reason, pantryId, navigation, Toast) => {
 	if (!reason) {

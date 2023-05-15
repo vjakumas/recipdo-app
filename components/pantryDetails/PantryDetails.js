@@ -1,24 +1,11 @@
 import React, { useState } from "react";
-import {
-	SafeAreaView,
-	View,
-	Text,
-	Image,
-	TouchableOpacity,
-	ScrollView,
-	ActivityIndicator,
-	Modal,
-	TouchableWithoutFeedback,
-	Alert,
-} from "react-native";
-import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
+import { SafeAreaView, View, Text, Image, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { COLORS } from "../../constants";
 import Toast from "react-native-toast-message";
-import firebase, { firestore } from "../../config/firebase/config";
 import styles from "./pantryDetails.style";
 import { useNavigation } from "@react-navigation/native";
 import { removeProduct } from "../../functions/ProductFunctions";
-import Constants from "expo-constants";
 
 const PantryDetails = ({ route }) => {
 	const { addedDate, date, isExpired, isExpiringSoon, name, pantryId, productImageURL, quantity, unit } = route.params;

@@ -1,23 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react"; // Add useCallback import
-import {
-	View,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	SafeAreaView,
-	Image,
-	FlatList,
-	ActivityIndicator,
-	TouchableWithoutFeedback,
-	Keyboard,
-} from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, Image, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "./search.styles";
-import { COLORS, FONT, SIZES, SHADOWS } from "../../constants";
-import axios from "axios";
-import { LinearGradient } from "expo-linear-gradient";
-import Constants from "expo-constants";
+import { COLORS } from "../../constants";
 import { fetchData, handleSearch } from "../../functions/SearchFunctions.js";
 import RecipeCardLargeList from "../../components/common/cards/recipeCardLarge/RecipeCardLargeList.js";
 

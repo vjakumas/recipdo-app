@@ -1,8 +1,8 @@
 import React, { useState, forwardRef, useEffect, useRef, useImperativeHandle } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
-import { COLORS, FONT, SIZES, SHADOWS } from "../../../../constants";
+import { COLORS, FONT } from "../../../../constants";
 import Modal from "react-native-modal";
-import firebase, { firestore } from "../../../../config/firebase/config";
+import firebase from "../../../../config/firebase/config";
 import Icon from "react-native-vector-icons/Ionicons"; // Import the Icon component
 
 const ProfileDropdown = forwardRef(({ handleSettings, handleLogout, handleStatistics }, ref) => {

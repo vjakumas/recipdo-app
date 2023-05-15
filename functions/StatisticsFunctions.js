@@ -1,4 +1,4 @@
-import firebase, { firestore } from "../config/firebase/config";
+import firebase from "../config/firebase/config";
 
 export const fetchUserData = async (setUserData) => {
 	const userId = firebase.auth().currentUser.uid;

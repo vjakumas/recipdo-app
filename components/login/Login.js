@@ -1,10 +1,9 @@
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, ImageBackground, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, ImageBackground, TouchableWithoutFeedback, Keyboard } from "react-native";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import firebase from "../../config/firebase/config";
-import { COLORS, icons, images, SIZES } from "../../constants";
+import { COLORS, images } from "../../constants";
 import styles from "./login.style";
-import { Touchable } from "react-native";
 
 const Login = () => {
 	const navigation = useNavigation();
