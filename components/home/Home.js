@@ -28,15 +28,15 @@ const Home = ({ navigation }) => {
 		updateExpiringItems();
 
 		// COMMENT/UNCOMMENT THIS LINE TO FETCH RECIPES
-		setLoading(false);
+		//setLoading(false);
 
 		// UNCOMMENT/COMMENT THIS CODE TO FETCH RECIPES
-		// Promise.all([fetchRecommendedRecipes(), fetchSaveTheFoodRecipes(), fetchMakeItAgainRecipes()]).then((values) => {
-		// 	setRecommendedRecipes(values[0]);
-		// 	setSaveTheFoodRecipes(values[1]);
-		// 	setMakeItAgainRecipes(values[2]);
-		// 	setLoading(false);
-		// });
+		Promise.all([fetchRecommendedRecipes(), fetchSaveTheFoodRecipes(), fetchMakeItAgainRecipes()]).then((values) => {
+			setRecommendedRecipes(values[0]);
+			setSaveTheFoodRecipes(values[1]);
+			setMakeItAgainRecipes(values[2]);
+			setLoading(false);
+		});
 	}, []);
 
 	const handleRefresh = async () => {
@@ -147,7 +147,6 @@ const Home = ({ navigation }) => {
 			<View style={styles.topBar}>
 				<Image source={require("../../assets/images/logo-black-green.png")} style={styles.logo} />
 				<View style={styles.rightIcons}>
-					<Ionicons name="notifications-outline" size={24} color={COLORS.darkGray} style={styles.notificationIcon} />
 					<ProfileDropdown
 						ref={profileDropdownRef}
 						handleSettings={handleSettings}
