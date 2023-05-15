@@ -69,6 +69,9 @@ const RecipeDetails = ({ route, navigation }) => {
 			const checkIfRecipeIsSavedData = await checkIfRecipeIsSaved(recipe, setIsSaved);
 			setIsSaved(checkIfRecipeIsSavedData);
 
+			const fetchIngredientsData = await fetchIngredients(recipe);
+			setIngredients(fetchIngredientsData);
+
 			const fetchedNutritionData = await fetchNutritionData(recipe);
 			setNutritionData(fetchedNutritionData);
 			setIsLoading(false);
@@ -237,18 +240,18 @@ const RecipeDetails = ({ route, navigation }) => {
 							<View>
 								<Image style={styles.image} source={{ uri: image }} />
 								<View style={styles.dishTypeContainer}>
-									<Text style={styles.dishType}>{dishType ? dishType.charAt(0).toUpperCase() + dishType.slice(1) : ""}</Text>
+									<Text style={styles.dishType}>{dishType ? dishType.charAt(0).toUpperCase() + dishType.slice(1) : "Recipe"}</Text>
 								</View>
 								<View style={styles.readyInMinutesContainer}>
 									<Text style={styles.readyInMinutes}>
-										<MaterialIcons name="timer" size={16} color="white" /> {readyInMinutes} min
+										<MaterialIcons name="timer" size={16} color="white" /> {readyInMinutes ? readyInMinutes : "15"} min
 									</Text>
 								</View>
 							</View>
 							<View style={styles.container}>
 								<View style={styles.header}>
 									<Text style={styles.title}>{title}</Text>
-									<TouchableOpacity style={styles.saveRecipeButton} onPress={toggleSaveRecipe}>
+									<TouchableOpacity style={styles.saveRecipeButton} onPress={() => toggleSaveRecipe(recipe, isSaved, setIsSaved)}>
 										{isSaved ? (
 											<MaterialIcons name="favorite" size={24} color="red" />
 										) : (

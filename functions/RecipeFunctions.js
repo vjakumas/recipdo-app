@@ -150,6 +150,7 @@ const getSaveTheFoodRecipes = async (userId) => {
 		return randomRecipes;
 	} else {
 		const prioritizedPantryItems = prioritizePantryItems(pantryItems);
+		console.log(prioritizedPantryItems);
 		const recipes = await fetchRecipesForSaveTheFood(prioritizedPantryItems);
 		return recipes;
 	}
@@ -218,7 +219,7 @@ const fetchRecipesForSaveTheFood = async (prioritizedPantryItems) => {
 		}
 	};
 
-	for (let i = prioritizePantryItems.length; i >= 0; i--) {
+	for (let i = 5; i >= 0; i--) {
 		const ingredients = prioritizedPantryItems
 			.slice(0, i)
 			.map((item) => item.name)

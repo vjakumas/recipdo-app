@@ -29,6 +29,7 @@ export const toggleSaveRecipe = async (recipe, isSaved, setIsSaved) => {
 	const userDoc = await userDocRef.get();
 	const existingSavedRecipeIds = userDoc.data().savedRecipes || [];
 
+	console.log(recipe);
 	let updatedSavedRecipeIds;
 	if (existingSavedRecipeIds.includes(recipe.id.toString())) {
 		updatedSavedRecipeIds = existingSavedRecipeIds.filter((id) => id !== recipe.id.toString());
@@ -39,7 +40,7 @@ export const toggleSaveRecipe = async (recipe, isSaved, setIsSaved) => {
 	await userDocRef.update({
 		savedRecipes: updatedSavedRecipeIds,
 	});
-
+	setIsSaved(!isSaved);
 	return !isSaved;
 };
 
