@@ -3,13 +3,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../constants/index";
 
-import Home from "../components/home/Home";
-import Search from "../components/search/Search";
-import AddProduct from "../components/addProduct/AddProduct";
-import PantryList from "../components/pantryList/PantryList";
-import SavedRecipes from "../components/savedRecipes/SavedRecipes";
-import AddNewProduct from "../components/addNewProduct/AddNewProduct";
-
 import MainStackNavigator from "./MainStackNavigator";
 import AddProductStackNavigator from "./AddProductStackNavigator";
 import PantryStackNavigator from "./PantryStackNavigator";
