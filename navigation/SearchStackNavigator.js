@@ -1,8 +1,8 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
-import RecipeDetails from "../components/recipeDetails/RecipeDetails";
-import Search from "../components/search/Search";
+import RecipeDetails from "../components/authorizedComponents/recipeDetails/RecipeDetails";
+import Search from "../components/authorizedComponents/search/Search";
 
 const SearchStack = createStackNavigator();
 

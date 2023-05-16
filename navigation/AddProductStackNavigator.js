@@ -1,8 +1,7 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import AddProduct from "../components/addProduct/AddProduct";
-import AddNewProduct from "../components/addNewProduct/AddNewProduct";
-import AddNewProductBarcode from "../components/addNewProductBarcode/AddNewProductBarcode";
+import AddProduct from "../components/authorizedComponents/addProduct/AddProduct";
+import AddNewProduct from "../components/authorizedComponents/addNewProduct/AddNewProduct";
 
 const AddProductStack = createStackNavigator();
 
@@ -14,7 +13,6 @@ const AddProductStackNavigator = () => {
 			}}>
 			<AddProductStack.Screen name="AddProduct" component={AddProduct} />
 			<AddProductStack.Screen name="AddNewProduct" component={AddNewProduct} />
-			<AddProductStack.Screen name="AddNewProductBarcode" component={AddNewProductBarcode} />
 		</AddProductStack.Navigator>
 	);
 };

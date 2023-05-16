@@ -1,9 +1,9 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import Home from "../components/home/Home";
-import SettingsScreen from "../components/settings/Settings";
-import StatisticsScreen from "../components/statistics/Statistic";
-import RecipeDetails from "../components/recipeDetails/RecipeDetails";
+import Home from "../components/authorizedComponents/home/Home";
+import SettingsScreen from "../components/authorizedComponents/settings/Settings";
+import StatisticsScreen from "../components/authorizedComponents/statistics/Statistic";
+import RecipeDetails from "../components/authorizedComponents/recipeDetails/RecipeDetails";
 
 const MainStack = createStackNavigator();
 

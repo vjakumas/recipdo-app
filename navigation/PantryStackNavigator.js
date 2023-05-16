@@ -1,9 +1,9 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import PantryList from "../components/pantryList/PantryList";
-import PantryDetails from "../components/pantryDetails/PantryDetails";
-import EditProduct from "../components/editProduct/EditProduct";
-import SearchScreen from "../components/search/Search";
+import PantryList from "../components/authorizedComponents/pantryList/PantryList";
+import PantryDetails from "../components/authorizedComponents/pantryDetails/PantryDetails";
+import EditProduct from "../components/authorizedComponents/editProduct/EditProduct";
+import SearchScreen from "../components/authorizedComponents/search/Search";
 
 const PantryStack = createStackNavigator();
 

@@ -1,8 +1,8 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
-import RecipeDetails from "../components/recipeDetails/RecipeDetails";
-import SavedRecipes from "../components/savedRecipes/SavedRecipes";
+import RecipeDetails from "../components/authorizedComponents/recipeDetails/RecipeDetails";
+import SavedRecipes from "../components/authorizedComponents/savedRecipes/SavedRecipes";
 
 const SavedRecipesStack = createStackNavigator();
 
