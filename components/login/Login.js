@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { View, Text, TouchableOpacity, TextInput, ImageBackground, TouchableWithoutFeedback, Keyboard } from "react-native";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -10,7 +11,7 @@ const Login = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
-	loginUser = async (email, password) => {
+	const loginUser = async (email, password) => {
 		try {
 			await firebase.auth().signInWithEmailAndPassword(email, password);
 			navigation.reset({ index: 0, routes: [{ name: "MainApp", state: { routes: [{ name: "Home" }] } }] });

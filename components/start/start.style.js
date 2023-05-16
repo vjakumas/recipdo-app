@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
 		fontFamily: FONT.medium,
 		color: COLORS.darkGray,
 		textAlign: "center",
-		marginBottom: SIZES.medium,
 	},
 	headerBtn: {
 		fontSize: SIZES.medium,

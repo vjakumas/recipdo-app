@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, TextInput, TouchableOpacity, SafeAreaView, Image, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";

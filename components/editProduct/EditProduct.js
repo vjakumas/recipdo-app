@@ -5,7 +5,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import styles from "./editProduct.style";
-import firebase, { firestore } from "../../config/firebase/config";
+import firebase from "../../config/firebase/config";
 import Toast from "react-native-toast-message";
 import { COLORS } from "../../constants";
 import axios from "axios";
@@ -13,7 +13,6 @@ import Constants from "expo-constants";
 
 const EditProduct = ({ route }) => {
 	const { pantryItem } = route.params;
-	const [show, setShow] = useState(false);
 	const [name, setSearchText] = useState(pantryItem.name || "");
 	const [quantity, setQuantity] = useState(pantryItem.quantity || "");
 	const [unit, setUnit] = useState(pantryItem.unit || "");

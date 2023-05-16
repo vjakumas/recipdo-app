@@ -8,22 +8,11 @@ const styles = StyleSheet.create({
 	container: {
 		padding: 16,
 	},
-	image: {
-		width: "100%",
-		height: 200,
-		resizeMode: "cover",
-	},
 	header: {
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
 		marginBottom: 5,
-	},
-	unitHeader: {
-		flexDirection: "row",
-		justifyContent: "start",
-		alignItems: "center",
-		marginBottom: 16,
 	},
 	title: {
 		flex: 1,

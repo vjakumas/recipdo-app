@@ -188,15 +188,6 @@ const styles = StyleSheet.create({
 		fontSize: SIZES.medium,
 	},
 	submitButton: {
-		backgroundColor: COLORS.primary,
-		borderRadius: 15,
-		paddingHorizontal: SIZES.large,
-		paddingVertical: SIZES.medium,
-		alignItems: "center",
-		justifyContent: "center",
-		marginTop: SIZES.medium,
-	},
-	submitButton: {
 		backgroundColor: COLORS.lightGray,
 		borderRadius: 15,
 		paddingHorizontal: SIZES.large,

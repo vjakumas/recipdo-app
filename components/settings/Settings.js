@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, SafeAreaView, TouchableWithoutFeedback, Keyboard } from "react-native";
 import Toast from "react-native-toast-message";
 import styles from "./settings.style";
@@ -12,15 +12,6 @@ const Settings = () => {
 	const user = firebase.auth().currentUser;
 	const usersRef = firebase.firestore().collection("users");
 
-	state = {
-		user: {
-			name: "",
-			email: "",
-			avatar: null,
-			password: "",
-		},
-	};
-
 	useEffect(() => {
 		if (user) {
 			usersRef
@@ -33,8 +24,6 @@ const Settings = () => {
 				});
 		}
 	}, [user]);
-
-	const profileImageRef = useRef(null);
 
 	const dismissKeyboard = () => {
 		Keyboard.dismiss();

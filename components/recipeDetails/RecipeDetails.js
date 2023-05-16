@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, View, Text, Image, Modal, TouchableWithoutFeedback } from "react-native";
 
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";

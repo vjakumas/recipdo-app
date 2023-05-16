@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, ImageBackground, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, ImageBackground, TouchableWithoutFeedback, Keyboard } from "react-native";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { COLORS, images } from "../../constants";
@@ -13,7 +13,7 @@ const Register = () => {
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [name, setName] = useState("");
 
-	registerUser = async (email, password, name) => {
+	const registerUser = async (email, password, name) => {
 		await firebase
 			.auth()
 			.createUserWithEmailAndPassword(email, password)

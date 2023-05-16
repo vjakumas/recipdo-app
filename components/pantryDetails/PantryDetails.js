@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { removeProduct } from "../../functions/ProductFunctions";
 
 const PantryDetails = ({ route }) => {
-	const { addedDate, date, isExpired, isExpiringSoon, name, pantryId, productImageURL, quantity, unit } = route.params;
+	const { date, name, pantryId, productImageURL, quantity, unit } = route.params;
 	const carbs = route.params.carbs || "N/A";
 	const fats = route.params.fats || "N/A";
 	const protein = route.params.protein || "N/A";

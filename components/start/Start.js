@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity, Image, TextInput, StyleSheet, ImageBackground, TouchableWithoutFeedback, Keyboard } from "react-native";
+/* eslint-disable react/no-unescaped-entities */
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import styles from "./start.style";
@@ -14,7 +15,8 @@ const Start = () => {
 			<View style={styles.mainContainer}>
 				<View style={styles.container}>
 					<Image style={styles.logoImage} source={require("../../assets/images/logo-black-green.png")} />
-					<Text style={styles.headerTitle}>Delicious recipes for every taste,{"\n"}let's begin!</Text>
+					<Text style={styles.headerTitle}>Delicious recipes for every taste, </Text>
+					<Text style={styles.headerTitle}>let's begin!</Text>
 				</View>
 				<View style={styles.bottomButtons}>
 					<TouchableOpacity onPress={() => navigation.navigate("Login")} style={styles.signInButton}>

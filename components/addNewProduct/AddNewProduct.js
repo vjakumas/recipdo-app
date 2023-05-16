@@ -5,18 +5,18 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import styles from "./addNewProduct.style";
-import firebase, { firestore } from "../../config/firebase/config";
+import firebase from "../../config/firebase/config";
 import Toast from "react-native-toast-message";
 import { COLORS } from "../../constants";
 import axios from "axios";
 import Constants from "expo-constants";
 import { getSuggestions } from "../../functions/ProductFunctions";
+import PropTypes from "prop-types";
 
 const AddNewProduct = () => {
 	const [quantity, setQuantity] = useState("");
 	const [unit, setUnit] = useState("g");
 	const [date, setDate] = useState(new Date());
-	const [show, setShow] = useState(false);
 	const [calories, setCalories] = useState("");
 	const [carbs, setCarbs] = useState("");
 	const [fats, setFats] = useState("");
@@ -79,6 +79,13 @@ const AddNewProduct = () => {
 				<Text style={styles.suggestionText}>{suggestion.name}</Text>
 			</TouchableOpacity>
 		);
+	};
+
+	SuggestionItem.propTypes = {
+		suggestion: PropTypes.shape({
+			name: PropTypes.string,
+		}).isRequired,
+		onPress: PropTypes.func.isRequired,
 	};
 
 	const fetchProductImage = async (name) => {
