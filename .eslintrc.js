@@ -5,7 +5,6 @@ module.exports = {
 		node: true,
 	},
 	extends: ["eslint:recommended", "plugin:react/recommended"],
-	overrides: [],
 	parserOptions: {
 		ecmaFeatures: {
 			jsx: true,
@@ -14,5 +13,7 @@ module.exports = {
 		sourceType: "module",
 	},
 	plugins: ["react"],
-	rules: {},
+	rules: {
+		"react/prop-types": "off",
+	},
 };
