@@ -164,20 +164,41 @@ const Home = ({ navigation }) => {
 							<View style={styles.categoryHeaderSaveTheFood}>
 								<Text style={styles.categoryTitleSaveTheFood}>Save-the-food recipes</Text>
 							</View>
-							<RecipeCardMediumSafeFoodList recipes={saveTheFoodRecipes} navigation={navigation} />
+							{saveTheFoodRecipes.length === 0 ? (
+								<View>
+									<Text style={styles.noRecipeText}>No recipes found in this category</Text>
+									<Text style={styles.noRecipeSubText}>Add some pantry items to see the `save-the-food` recipes</Text>
+								</View>
+							) : (
+								<RecipeCardMediumSafeFoodList recipes={saveTheFoodRecipes} navigation={navigation} />
+							)}
 						</View>
 						<View style={styles.categorySection}>
 							<View style={styles.categoryHeader}>
 								<Text style={styles.categoryTitle}>Recommended for you</Text>
 							</View>
-							<RecipeCardMediumList recipes={recommendedRecipes} navigation={navigation} />
+							{recommendedRecipes.length === 0 ? (
+								<View>
+									<Text style={styles.noRecipeText}>No recipes found in this category</Text>
+									<Text style={styles.noRecipeSubText}>Finish some recipes see the recommended recipes</Text>
+								</View>
+							) : (
+								<RecipeCardMediumList recipes={recommendedRecipes} navigation={navigation} />
+							)}
 						</View>
 
 						<View style={styles.categorySection}>
 							<View style={styles.categoryHeader}>
 								<Text style={styles.categoryTitle}>Make it again</Text>
 							</View>
-							<RecipeCardMediumList recipes={makeItAgainRecipes} navigation={navigation} />
+							{makeItAgainRecipes.length === 0 ? (
+								<View>
+									<Text style={styles.noRecipeText}>No recipes found in this category</Text>
+									<Text style={styles.noRecipeSubText}>Finished recipes will be displayed here</Text>
+								</View>
+							) : (
+								<RecipeCardMediumList recipes={makeItAgainRecipes} navigation={navigation} />
+							)}
 						</View>
 					</View>
 				</ScrollView>

@@ -5,6 +5,7 @@ import stringSimilarity from "string-similarity";
 import Toast from "react-native-toast-message";
 
 export const fetchRecipeDetails = async (recipeId) => {
+	console.log(recipeId);
 	const options = {
 		method: "GET",
 		url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${recipeId}/information`,
@@ -28,8 +29,6 @@ export const toggleSaveRecipe = async (recipe, isSaved, setIsSaved) => {
 	const userDocRef = firebase.firestore().collection("users").doc(userId);
 	const userDoc = await userDocRef.get();
 	const existingSavedRecipeIds = userDoc.data().savedRecipes || [];
-
-	console.log(recipe);
 	let updatedSavedRecipeIds;
 	if (existingSavedRecipeIds.includes(recipe.id.toString())) {
 		updatedSavedRecipeIds = existingSavedRecipeIds.filter((id) => id !== recipe.id.toString());
@@ -183,6 +182,7 @@ export const checkIfRecipeIsSaved = async (recipe, setIsSaved) => {
 	const existingSavedRecipeIds = userDoc.data().savedRecipes || [];
 
 	const isRecipeSaved = existingSavedRecipeIds.includes(recipe.id.toString());
+	console.log("Is saved?: " + isRecipeSaved);
 	setIsSaved(isRecipeSaved);
 };
 
@@ -278,9 +278,6 @@ export const subtractIngredients = async (ingredients, pantryItems) => {
 	let consumedProductsCount = 0;
 	let consumedProductsList = [];
 	const similarityThreshold = 0.5;
-
-	console.log(ingredients);
-	console.log(pantryItems);
 
 	for (const ingredient of ingredients) {
 		const matchingPantryItems = pantryItems.filter((item) => {

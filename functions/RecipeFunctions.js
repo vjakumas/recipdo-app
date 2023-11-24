@@ -20,6 +20,8 @@ export const fetchMakeItAgainRecipes = async () => {
 
 			const recipes = await getRecipeInformationBulk(uniqueFinishedRecipeIds);
 			return recipes;
+		} else {
+			return [];
 		}
 	} catch (error) {
 		console.error("Error fetching make it again recipes:", error);
@@ -144,12 +146,15 @@ const getRecipeInformationBulk = async (recipeIds) => {
 
 const getSaveTheFoodRecipes = async (userId) => {
 	const pantryItems = await fetchPantryItems(userId);
+	if (!pantryItems.length || pantryItems.length === 0) {
+		return [];
+	}
+
 	if (pantryItems.length === 0) {
 		const randomRecipes = await getRandomRecipes(10);
 		return randomRecipes;
 	} else {
 		const prioritizedPantryItems = prioritizePantryItems(pantryItems);
-		console.log(prioritizedPantryItems);
 		const recipes = await fetchRecipesForSaveTheFood(prioritizedPantryItems);
 		return recipes;
 	}

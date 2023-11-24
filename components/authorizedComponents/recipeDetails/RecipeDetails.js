@@ -19,6 +19,7 @@ import {
 
 const RecipeDetails = ({ route, navigation }) => {
 	const [recipe, setRecipe] = useState(route.params.recipe);
+	const [recipeData, setRecipeData] = useState(null);
 	const title = recipe?.title || "";
 	const servings = recipe?.servings || "";
 	const image = recipe?.image || "";
@@ -27,6 +28,7 @@ const RecipeDetails = ({ route, navigation }) => {
 	const instructions = recipe?.instructions || "";
 	const [pantryItems, setPantryItems] = useState([]);
 	const [ingredients, setIngredients] = useState([]);
+	const [instructionsData, setInstructionsData] = useState([]);
 	const [nutritionData, setNutritionData] = useState(null);
 	const [isSaved, setIsSaved] = useState(false);
 	const [ingredientAvailability, setIngredientAvailability] = useState([]);
@@ -46,11 +48,11 @@ const RecipeDetails = ({ route, navigation }) => {
 			const fetchedPantryItemsData = await fetchPantryItems();
 			setPantryItems(fetchedPantryItemsData);
 
-			const fetchedIngredientData = await fetchIngredients(recipe);
-			setIngredients(fetchedIngredientData);
+			await checkIfRecipeIsSaved(recipe, setIsSaved);
 
-			const checkIfRecipeIsSavedData = await checkIfRecipeIsSaved(recipe, setIsSaved);
-			setIsSaved(checkIfRecipeIsSavedData);
+			const fetchRecipeData = await fetchRecipeDetails(recipe.id);
+			setInstructionsData(fetchRecipeData.instructions);
+			setRecipeData(fetchRecipeData);
 
 			const fetchIngredientsData = await fetchIngredients(recipe);
 			setIngredients(fetchIngredientsData);
@@ -146,11 +148,11 @@ const RecipeDetails = ({ route, navigation }) => {
 	};
 
 	const renderInstructions = () => {
-		if (!instructions || instructions === "No instructions provided") {
+		if (!instructionsData || instructionsData === "No instructions provided") {
 			return <Text style={styles.text}>No instructions provided</Text>;
 		}
 
-		const steps = instructions.split(".").filter((step) => step.trim().length > 0);
+		const steps = instructionsData.split(".").filter((step) => step.trim().length > 0);
 
 		return (
 			<View style={styles.instructionsContainer}>
@@ -198,7 +200,7 @@ const RecipeDetails = ({ route, navigation }) => {
 											style={styles.modalConfirmButton}
 											onPress={() =>
 												finishRecipe(
-													recipe,
+													recipeData,
 													navigation,
 													hideModal,
 													subtractIngredients,
@@ -242,7 +244,7 @@ const RecipeDetails = ({ route, navigation }) => {
 										)}
 									</TouchableOpacity>
 								</View>
-								<Text style={styles.servings}>{servings} servings</Text>
+								<Text style={styles.servings}> {servings === "" ? "2" : servings} servings</Text>
 								{nutritionData && (
 									<View style={styles.nutritionContainer}>
 										<Text style={styles.nutritionTitle}>Nutrition Facts</Text>

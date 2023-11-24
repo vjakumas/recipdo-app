@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { COLORS, FONT } from "../../../constants";
+import { COLORS, FONT, SIZES } from "../../../constants";
 
 const styles = StyleSheet.create({
 	container: {
@@ -106,6 +106,19 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+	},
+	noRecipeText: {
+		marginLeft: 16,
+		fontFamily: FONT.semiBold,
+		fontSize: SIZES.medium,
+		color: COLORS.darkGray,
+	},
+	noRecipeSubText: {
+		marginBottom: "10%",
+		marginLeft: 16,
+		marginRight: 16,
+		fontFamily: FONT.semiBold,
+		color: COLORS.gray,
 	},
 });
 

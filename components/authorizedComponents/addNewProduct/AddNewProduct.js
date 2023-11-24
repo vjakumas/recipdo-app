@@ -200,8 +200,6 @@ const AddNewProduct = () => {
 
 			const response = await axios.request(options);
 
-			setProductImage(response.data[0].image);
-
 			return response.data.length > 0;
 		} catch (error) {
 			console.error("Error checking recipe:", error);
